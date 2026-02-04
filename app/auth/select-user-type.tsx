@@ -1,10 +1,52 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, Platform } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, Platform, ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { supabase } from '../../supabase';
 
 export default function SelectUserTypePage() {
   const router = useRouter();
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          setChecking(false);
+          return;
+        }
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('user_type, onboarding_completed')
+          .eq('id', session.user.id)
+          .single();
+        if (!profile) {
+          setChecking(false);
+          return;
+        }
+        const basePath = profile.user_type === 'employer' ? '/employer' : '/worker';
+        const destination = profile.onboarding_completed ? basePath : `${basePath}/onboarding`;
+        if (Platform.OS === 'web' && typeof window !== 'undefined') {
+          window.location.href = destination;
+        } else {
+          router.replace(destination as any);
+        }
+      } catch {
+        setChecking(false);
+      }
+    })();
+  }, [router]);
+
+  if (checking) {
+    return (
+      <View style={[StyleSheet.absoluteFillObject, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#7C3AED' }]}>
+        <ActivityIndicator size="large" color="#FFF" />
+        <Text style={{ marginTop: 12, color: '#FFF', fontSize: 16 }}>Loading...</Text>
+      </View>
+    );
+  }
 
   return (
     <ImageBackground

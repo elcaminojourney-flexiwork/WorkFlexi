@@ -16,7 +16,7 @@ export default function WorkerLayout() {
         if (cancelled) return;
         if (!session?.user) {
           if (Platform.OS === 'web' && typeof window !== 'undefined') {
-            window.location.href = '/auth/select-user-type';
+            window.location.href = (window.location.origin || '') + '/auth/select-user-type';
           } else {
             router.replace('/auth/select-user-type');
           }
@@ -32,7 +32,7 @@ export default function WorkerLayout() {
         if (cancelled) return;
         if (!profile || profile.user_type !== 'worker') {
           if (Platform.OS === 'web' && typeof window !== 'undefined') {
-            window.location.href = '/auth/select-user-type';
+            window.location.href = (window.location.origin || '') + '/auth/select-user-type';
           } else {
             router.replace('/auth/select-user-type');
           }
@@ -47,7 +47,7 @@ export default function WorkerLayout() {
           setGuardReady(true);
           setAuthorized(false);
           if (Platform.OS === 'web' && typeof window !== 'undefined') {
-            window.location.href = '/auth/select-user-type';
+            window.location.href = (window.location.origin || '') + '/auth/select-user-type';
           } else {
             router.replace('/auth/select-user-type');
           }
