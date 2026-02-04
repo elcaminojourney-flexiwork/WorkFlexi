@@ -96,11 +96,18 @@ export default function SelectUserTypePage() {
           </TouchableOpacity>
         </View>
 
-        {/* Footer */}
+        {/* Footer: Sign up as Worker / Employer */}
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            New to FlexiWork? You'll be able to sign up after selecting your type.
-          </Text>
+          <Text style={styles.footerText}>New to FlexiWork?</Text>
+          <View style={styles.signUpRow}>
+            <TouchableOpacity onPress={() => router.push('/auth/register?type=worker')}>
+              <Text style={styles.signUpLink}>Sign up as Worker</Text>
+            </TouchableOpacity>
+            <Text style={styles.footerText}> · </Text>
+            <TouchableOpacity onPress={() => router.push('/auth/register?type=employer')}>
+              <Text style={styles.signUpLink}>Sign up as Employer</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </ImageBackground>
@@ -242,11 +249,25 @@ const styles = StyleSheet.create({
   },
   footer: {
     paddingVertical: 24,
+    alignItems: 'center',
   },
   footerText: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.8)',
     textAlign: 'center',
     fontWeight: '500',
+  },
+  signUpRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+    flexWrap: 'wrap',
+  },
+  signUpLink: {
+    fontSize: 15,
+    color: '#FFFFFF',
+    fontWeight: '700',
+    textDecorationLine: 'underline',
   },
 });

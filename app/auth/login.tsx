@@ -1,8 +1,8 @@
-// app/auth/login.tsx - Login page with timeout handling
-import { useState } from 'react';
+// app/auth/login.tsx - Login page with Worker | Employer panel and timeout handling
+import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ImageBackground, Image, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../supabase';
 
@@ -15,12 +15,20 @@ const COLORS = {
 
 const LOGIN_TIMEOUT = 15000; // 15 seconds
 
+type LoginPanelType = 'worker' | 'employer';
+
 export default function LoginPage() {
   const router = useRouter();
+  const { type } = useLocalSearchParams<{ type?: string }>();
+  const [panelType, setPanelType] = useState<LoginPanelType>('worker');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (type === 'employer' || type === 'worker') setPanelType(type);
+  }, [type]);
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
@@ -56,13 +64,10 @@ export default function LoginPage() {
         throw new Error('Profile not found');
       }
 
-      // Determine destination
+      // New users → onboarding; existing → dashboard
       const basePath = profile.user_type === 'employer' ? '/employer' : '/worker';
       const destination = profile.onboarding_completed ? basePath : `${basePath}/onboarding`;
 
-      console.log('✅ Login success, redirecting to:', destination);
-
-      // Navigate using router
       router.replace(destination as any);
 
     } catch (error: any) {
@@ -102,6 +107,27 @@ export default function LoginPage() {
 
           {/* Form Card */}
           <LinearGradient colors={[COLORS.purple100, COLORS.blue100]} style={styles.card}>
+            {/* Worker | Employer panel (2 parts) */}
+            <View style={styles.panelRow}>
+              <TouchableOpacity
+                style={[styles.panelTab, panelType === 'worker' && styles.panelTabActive]}
+                onPress={() => setPanelType('worker')}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="person" size={20} color={panelType === 'worker' ? COLORS.white : COLORS.purple700} />
+                <Text style={[styles.panelTabText, panelType === 'worker' && styles.panelTabTextActive]}>Worker</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.panelTab, panelType === 'employer' && styles.panelTabActive]}
+                onPress={() => setPanelType('employer')}
+                activeOpacity={0.8}
+              >
+                <Ionicons name="business" size={20} color={panelType === 'employer' ? COLORS.white : COLORS.purple700} />
+                <Text style={[styles.panelTabText, panelType === 'employer' && styles.panelTabTextActive]}>Employer</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.panelHint}>Sign in to your {panelType === 'worker' ? 'worker' : 'employer'} account</Text>
+
             {/* Email */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Email</Text>
@@ -183,6 +209,12 @@ const styles = StyleSheet.create({
   title: { fontSize: 32, fontWeight: '800', color: '#FFF' },
   subtitle: { fontSize: 16, color: 'rgba(255,255,255,0.8)', marginTop: 8 },
   card: { borderRadius: 24, padding: 24 },
+  panelRow: { flexDirection: 'row', marginBottom: 8, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 14, padding: 4 },
+  panelTab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderRadius: 12 },
+  panelTabActive: { backgroundColor: COLORS.purple600 },
+  panelTabText: { fontSize: 15, fontWeight: '700', color: COLORS.purple700 },
+  panelTabTextActive: { color: COLORS.white },
+  panelHint: { fontSize: 13, color: COLORS.gray500, marginBottom: 20, textAlign: 'center' },
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 14, fontWeight: '700', color: COLORS.purple700, marginBottom: 8 },
   inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14, borderWidth: 2, borderColor: COLORS.purple100 },

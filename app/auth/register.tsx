@@ -60,9 +60,8 @@ export default function RegisterPage() {
         });
         if (profileError) throw profileError;
 
-        Alert.alert('Success', 'Account created! Please check your email to verify.', [
-          { text: 'OK', onPress: () => router.replace('/auth/login') }
-        ]);
+        // New sign up → onboarding (user is already logged in)
+        router.replace(`/${userType}/onboarding` as any);
       }
     } catch (error: any) {
       Alert.alert('Registration Failed', error.message);
