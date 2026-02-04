@@ -1,8 +1,8 @@
 // supabase.web.js - FlexiWork Supabase Client (web only, no native AsyncStorage)
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://gqhcuwwzjowdplfyizyb.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxaGN1d3d6am93ZHBsZnlpenliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU1NTQ3ODMsImV4cCI6MjA1MTEzMDc4M30.5dxURJnuMKf0gOFxEwdnLLfnf-N5Y9f_wq0DTxcHhq8';
+const supabaseUrl = 'https://ewudhvaunpsnevrgweor.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3dWRodmF1bnBzbmV2cmd3ZW9yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI0MTUxNDksImV4cCI6MjA3Nzk5MTE0OX0.N-nRw972VGQn7fxihOxFn6-GQYkvCN6YhHF8gd8RLkM';
 
 const webStorage = {
   getItem: (key) => {
