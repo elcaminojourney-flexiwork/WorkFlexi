@@ -6,14 +6,15 @@ import { useRouter } from 'expo-router';
 import { supabase } from '../supabase';
 
 const MAX_WAIT = 3000; // Maximum 3 seconds before forcing login redirect
+const FALLBACK_BUTTON_AFTER_MS = 2500; // Show "Continue" button if still on index
 
 export default function IndexPage() {
   const router = useRouter();
   const [status, setStatus] = useState<'loading' | 'redirecting'>('loading');
+  const [showFallbackButton, setShowFallbackButton] = useState(false);
   const didRedirect = useRef(false);
 
   useEffect(() => {
-    // Force redirect after MAX_WAIT ms – main entry = select-user-type (Welcome Worker/Employer)
     const forceTimer = setTimeout(() => {
       if (!didRedirect.current) {
         console.log('⏱️ Force redirect to main entry (select-user-type)');
@@ -21,20 +22,34 @@ export default function IndexPage() {
       }
     }, MAX_WAIT);
 
-    // Check auth status
+    const fallbackTimer = setTimeout(() => {
+      if (!didRedirect.current) setShowFallbackButton(true);
+    }, FALLBACK_BUTTON_AFTER_MS);
+
     checkAuth();
 
-    return () => clearTimeout(forceTimer);
+    return () => {
+      clearTimeout(forceTimer);
+      clearTimeout(fallbackTimer);
+    };
   }, []);
 
   const doRedirect = (path: string) => {
     if (didRedirect.current) return;
     didRedirect.current = true;
     setStatus('redirecting');
-    
+
     console.log('🚀 Navigating to:', path);
-    
-    // Use router for navigation
+
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      try {
+        window.location.href = path;
+        return;
+      } catch (e) {
+        console.warn('window.location redirect failed, trying router', e);
+      }
+    }
+
     setTimeout(() => {
       router.replace(path as any);
     }, 100);
@@ -145,5 +160,22 @@ const styles = StyleSheet.create({
     marginTop: 8, 
     fontSize: 16, 
     color: 'rgba(255,255,255,0.9)',
+  },
+  fallbackButton: {
+    marginTop: 24,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    backgroundColor: 'rgba(255,255,255,0.95)',
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  fallbackButtonText: {
+    color: '#7C3AED',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

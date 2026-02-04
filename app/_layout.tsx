@@ -1,25 +1,36 @@
 // app/_layout.tsx - Root layout with simple structure
+import { useEffect, useState } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { PaperProvider } from 'react-native-paper';
-import { View, StyleSheet, Platform } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { defaultTheme } from '@/constants/paperTheme';
+
+const FONT_LOAD_TIMEOUT_MS = 5000;
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+  const [fontTimeout, setFontTimeout] = useState(false);
 
-  if (!loaded) {
-    // Return simple loading view while fonts load
+  useEffect(() => {
+    const t = setTimeout(() => setFontTimeout(true), FONT_LOAD_TIMEOUT_MS);
+    return () => clearTimeout(t);
+  }, []);
+
+  const ready = loaded || fontTimeout;
+
+  if (!ready) {
     return (
       <View style={styles.loading}>
+        <Text style={styles.loadingText}>Loading...</Text>
         <StatusBar style="light" />
       </View>
     );
@@ -59,5 +70,12 @@ const styles = StyleSheet.create({
   loading: {
     flex: 1,
     backgroundColor: '#7C3AED',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '600',
   },
 });
