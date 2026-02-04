@@ -4,7 +4,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "build": "expo export --platform web",
+    "build": "expo export --platform web && node scripts/copy-netlify-redirects.js",
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
