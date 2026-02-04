@@ -21,19 +21,14 @@ export default function SelectUserTypePage() {
       />
 
       <View style={styles.container}>
-        {/* Logo */}
-        <View style={styles.logoWrapper}>
-          <Image
-            source={require('../../assets/images/logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-        </View>
-
-        {/* Header Section */}
+        {/* Header: centered logo (double size), no round icon */}
         <View style={styles.header}>
-          <View style={styles.iconCircle}>
-            <Ionicons name="people" size={48} color="#8B5CF6" />
+          <View style={styles.logoCenterWrapper}>
+            <Image
+              source={require('../../assets/images/logo.png')}
+              style={styles.logoCenter}
+              resizeMode="contain"
+            />
           </View>
           <Text style={styles.title}>Welcome to FlexiWork</Text>
           <Text style={styles.subtitle}>Choose how you'd like to use the platform</Text>
@@ -115,9 +110,6 @@ export default function SelectUserTypePage() {
 }
 
 const styles = StyleSheet.create({
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 12, elevation: 8 },
-  logo: { width: 32, height: 32 },
-
   backgroundImage: {
     flex: 1,
     width: '100%',
@@ -128,42 +120,25 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingTop: Platform.OS === 'web' ? 24 : 60,
   },
-  logoWrapper: {
-    position: 'absolute',
-    top: Platform.OS === 'web' ? 16 : 52,
-    left: 16,
-    zIndex: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 16,
-    padding: 8,
-    shadowColor: '#8B5CF6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  logo: {
-    width: 40,
-    height: 40,
-  },
   header: {
     alignItems: 'center',
-    marginTop: 80,
-    marginBottom: 40,
+    marginTop: Platform.OS === 'web' ? 48 : 60,
+    marginBottom: 32,
   },
-  iconCircle: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
+  logoCenterWrapper: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderRadius: 24,
+    padding: 16,
     marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.2,
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
     shadowRadius: 16,
     elevation: 12,
+  },
+  logoCenter: {
+    width: 80,
+    height: 80,
   },
   title: {
     fontSize: 32,

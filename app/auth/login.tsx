@@ -1,5 +1,5 @@
-// app/auth/login.tsx - Login page with Worker | Employer panel and timeout handling
-import { useState, useEffect } from 'react';
+// app/auth/login.tsx - Role-specific login (Worker or Employer from previous page)
+import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ImageBackground, Image, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -15,20 +15,14 @@ const COLORS = {
 
 const LOGIN_TIMEOUT = 15000; // 15 seconds
 
-type LoginPanelType = 'worker' | 'employer';
-
 export default function LoginPage() {
   const router = useRouter();
   const { type } = useLocalSearchParams<{ type?: string }>();
-  const [panelType, setPanelType] = useState<LoginPanelType>('worker');
+  const role = (type === 'employer' ? 'employer' : 'worker') as 'worker' | 'employer';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    if (type === 'employer' || type === 'worker') setPanelType(type);
-  }, [type]);
 
   const handleLogin = async () => {
     if (!email.trim() || !password) {
@@ -67,7 +61,6 @@ export default function LoginPage() {
       // New users → onboarding; existing → dashboard
       const basePath = profile.user_type === 'employer' ? '/employer' : '/worker';
       const destination = profile.onboarding_completed ? basePath : `${basePath}/onboarding`;
-
       router.replace(destination as any);
 
     } catch (error: any) {
@@ -99,35 +92,14 @@ export default function LoginPage() {
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           
-          {/* Header */}
+          {/* Header – role from previous page (no shared panel) */}
           <View style={styles.header}>
-            <Text style={styles.title}>Welcome Back</Text>
-            <Text style={styles.subtitle}>Sign in to continue</Text>
+            <Text style={styles.title}>{role === 'employer' ? 'Employer' : 'Worker'} sign in</Text>
+            <Text style={styles.subtitle}>{role === 'employer' ? 'Sign in to your employer account' : 'Sign in to your worker account'}</Text>
           </View>
 
           {/* Form Card */}
           <LinearGradient colors={[COLORS.purple100, COLORS.blue100]} style={styles.card}>
-            {/* Worker | Employer panel (2 parts) */}
-            <View style={styles.panelRow}>
-              <TouchableOpacity
-                style={[styles.panelTab, panelType === 'worker' && styles.panelTabActive]}
-                onPress={() => setPanelType('worker')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="person" size={20} color={panelType === 'worker' ? COLORS.white : COLORS.purple700} />
-                <Text style={[styles.panelTabText, panelType === 'worker' && styles.panelTabTextActive]}>Worker</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.panelTab, panelType === 'employer' && styles.panelTabActive]}
-                onPress={() => setPanelType('employer')}
-                activeOpacity={0.8}
-              >
-                <Ionicons name="business" size={20} color={panelType === 'employer' ? COLORS.white : COLORS.purple700} />
-                <Text style={[styles.panelTabText, panelType === 'employer' && styles.panelTabTextActive]}>Employer</Text>
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.panelHint}>Sign in to your {panelType === 'worker' ? 'worker' : 'employer'} account</Text>
-
             {/* Email */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Email</Text>
@@ -185,11 +157,11 @@ export default function LoginPage() {
             </TouchableOpacity>
           </LinearGradient>
 
-          {/* Register Link – direct to Create Account (no extra selection page) */}
+          {/* Register Link – same role as current (Employer → employer sign up, Worker → worker sign up) */}
           <View style={styles.registerRow}>
             <Text style={styles.registerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => router.push('/auth/register?type=worker')}>
-              <Text style={styles.registerLink}>Sign Up</Text>
+            <TouchableOpacity onPress={() => router.push(`/auth/register?type=${role}`)}>
+              <Text style={styles.registerLink}>{role === 'employer' ? 'Employer sign up' : 'Worker sign up'}</Text>
             </TouchableOpacity>
           </View>
 
@@ -209,12 +181,6 @@ const styles = StyleSheet.create({
   title: { fontSize: 32, fontWeight: '800', color: '#FFF' },
   subtitle: { fontSize: 16, color: 'rgba(255,255,255,0.8)', marginTop: 8 },
   card: { borderRadius: 24, padding: 24 },
-  panelRow: { flexDirection: 'row', marginBottom: 8, backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: 14, padding: 4 },
-  panelTab: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderRadius: 12 },
-  panelTabActive: { backgroundColor: COLORS.purple600 },
-  panelTabText: { fontSize: 15, fontWeight: '700', color: COLORS.purple700 },
-  panelTabTextActive: { color: COLORS.white },
-  panelHint: { fontSize: 13, color: COLORS.gray500, marginBottom: 20, textAlign: 'center' },
   inputGroup: { marginBottom: 20 },
   label: { fontSize: 14, fontWeight: '700', color: COLORS.purple700, marginBottom: 8 },
   inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14, borderWidth: 2, borderColor: COLORS.purple100 },
