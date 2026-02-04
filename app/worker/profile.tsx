@@ -1,23 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  TouchableOpacity,
-  Platform,
-  Image,
-ImageBackground,
-} from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, ScrollView, TouchableOpacity, Platform, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Button, Card } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../supabase';
 import ReviewCard from '../../components/ReviewCard';
 import { NotificationList } from '../../components/ui/NotificationList';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../components/ConstitutionalScreen';
 
 type WorkerProfile = {
   id: string;
@@ -208,370 +198,171 @@ export default function WorkerProfileScreen() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={styles.loadingText}>Loading your profile…</Text>
-      </View>
+      <ConstitutionalScreen title="Your profile" showBack onBack={() => router.replace('/worker')} showLogo>
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#FFF" />
+          <Text style={styles.loadingText}>Loading your profile…</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   if (!profile) {
     return (
-      <View style={styles.center}>
+      <ConstitutionalScreen title="Your profile" showBack onBack={() => router.replace('/worker')} showLogo>
         <Text style={styles.emptyText}>Profile not found.</Text>
-        <Button
-          mode="outlined"
-          onPress={() => router.replace('/worker')}
-          icon="arrow-back"
-          style={{ marginVertical: 8 }}
-          textColor="#3B82F6"
-        >
-          Back to dashboard
-        </Button>
-      </View>
+        <TouchableOpacity onPress={() => router.replace('/worker')} style={styles.backButtonWrap}>
+          <Text style={styles.backButtonText}>Back to dashboard</Text>
+        </TouchableOpacity>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <ScrollView style={styles.screen} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Button
-          mode="text"
-          onPress={() => router.replace('/worker')}
-          icon="arrow-back"
-          style={{ marginLeft: -8 }}
-        >
-          Back
-        </Button>
-        <Text style={styles.headerTitle}>Your profile</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
-      <View style={styles.container}>
-        {/* Blocked Warning */}
+    <ConstitutionalScreen title="Your profile" showBack onBack={() => router.replace('/worker')} showLogo>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
         {profile.is_blocked && (
-          <Card mode="elevated" style={{ marginBottom: 12, backgroundColor: '#EDE9FE', borderColor: '#7C3AED', borderWidth: 2 }}>
-            <Card.Content style={{ paddingVertical: 16 }}>
-              <View style={styles.blockedWarning}>
-                <Ionicons name="warning" size={24} color="#7C3AED" />
-                <View style={styles.blockedWarningText}>
-                  <Text style={styles.blockedWarningTitle}>Profile Blocked</Text>
-                  <Text style={styles.blockedWarningMessage}>
-                    Your profile has been blocked due to low rating (average rating: {profile.average_rating?.toFixed(1) || 'N/A'}/5.0). 
-                    You cannot see shifts or be invited by employers. Please contact support.
-                  </Text>
-                </View>
-              </View>
-            </Card.Content>
-          </Card>
-        )}
-
-        {/* Top card */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Content style={{ alignItems: 'center', paddingVertical: 20 }}>
-            {profile.profile_photo_url ? (
-              <Image
-                source={{ uri: profile.profile_photo_url }}
-                style={styles.profilePhoto}
-              />
-            ) : (
-              <View style={styles.avatarCircle}>
-                <Ionicons name="person" size={32} color="#3B82F6" />
-              </View>
-            )}
-            <Text style={styles.nameText}>
-              {profile.full_name || 'Worker'}
-            </Text>
-            <Text style={styles.roleText}>Flexi worker</Text>
-
-            <View style={styles.ratingRow}>
-              <Ionicons name="star" size={18} color="#FBBF24" />
-              <Text style={styles.ratingText}>
-                {profile.average_rating != null ? profile.average_rating.toFixed(1) : '–'}
-              </Text>
-              <Text style={styles.ratingCount}>
-                ({profile.total_reviews || 0} reviews)
-              </Text>
-            </View>
-          </Card.Content>
-        </Card>
-
-        {/* Contact & basic info */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Contact" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-            <View style={styles.row}>
-              <Ionicons name="mail-outline" size={18} color="#6B7280" />
-              <Text style={styles.rowLabel}>Email</Text>
-              <Text style={styles.rowValue}>
-                {profile.email || 'Not set'}
-              </Text>
-            </View>
-
-            <View style={styles.row}>
-              <Ionicons name="call-outline" size={18} color="#6B7280" />
-              <Text style={styles.rowLabel}>Phone</Text>
-              <Text style={styles.rowValue}>
-                {profile.phone || 'Not set'}
-              </Text>
-            </View>
-
-            <View style={styles.row}>
-              <Ionicons name="location-outline" size={18} color="#6B7280" />
-              <Text style={styles.rowLabel}>Base location</Text>
-              <Text style={styles.rowValue}>
-                {profile.location || 'Not set'}
-              </Text>
-            </View>
-          </Card.Content>
-        </Card>
-
-        {/* Work preferences */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Work preferences" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-            <View style={styles.row}>
-              <Ionicons name="briefcase-outline" size={18} color="#6B7280" />
-              <Text style={styles.rowLabel}>Experience level</Text>
-              <Text style={styles.rowValue}>
-                {profile.experience_level || 'Any / not set'}
-              </Text>
-            </View>
-
-            <View style={styles.row}>
-              <Ionicons name="pin-outline" size={18} color="#6B7280" />
-              <Text style={styles.rowLabel}>Preferred area</Text>
-              <Text style={styles.rowValue}>
-                {profile.preferred_location || 'Any / not set'}
-              </Text>
-            </View>
-
-            <View style={styles.skillsBlock}>
-              <Text style={styles.sectionLabel}>Skills</Text>
-              {profile.skills ? (
-                <Text style={styles.skillsText}>{profile.skills}</Text>
-              ) : (
-                <Text style={styles.emptySubText}>
-                  No skills added yet.
+          <PanelPurple style={{ borderWidth: 2, borderColor: '#7C3AED' }}>
+            <View style={styles.blockedWarning}>
+              <Ionicons name="warning" size={24} color="#7C3AED" />
+              <View style={styles.blockedWarningText}>
+                <Text style={styles.blockedWarningTitle}>Profile Blocked</Text>
+                <Text style={styles.blockedWarningMessage}>
+                  Your profile has been blocked due to low rating (average: {profile.average_rating?.toFixed(1) || 'N/A'}/5.0). Please contact support.
                 </Text>
-              )}
-            </View>
-          </Card.Content>
-        </Card>
-
-        {/* Bio */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="About you" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-            <Text style={styles.bioText}>
-              {profile.bio || 'Tell employers more about yourself in your bio.'}
-            </Text>
-          </Card.Content>
-        </Card>
-
-        {/* CV / Resume */}
-        {profile.cv_url && (
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="CV / Resume" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content>
-              <TouchableOpacity
-                style={styles.cvButton}
-                onPress={() => {
-                  if (Platform.OS === 'web') {
-                    window.open(profile.cv_url!, '_blank');
-                  } else {
-                    Alert.alert('CV', 'View CV in browser: ' + profile.cv_url);
-                  }
-                }}
-              >
-                <Ionicons name="document-text" size={20} color="#3B82F6" />
-                <Text style={styles.cvButtonText}>View CV / Resume</Text>
-                <Ionicons name="open-outline" size={18} color="#3B82F6" />
-              </TouchableOpacity>
-            </Card.Content>
-          </Card>
-        )}
-
-        {/* Marketplace Upgrade - Only show for employees without marketplace access */}
-        {(profile.marketplace_enabled === false && (profile.onboarding_type === 'employee' || profile.onboarding_type === null)) && (
-          <Card mode="elevated" style={{ marginBottom: 12, backgroundColor: '#EFF6FF', borderColor: '#3B82F6', borderWidth: 2 }}>
-            <Card.Content style={{ paddingVertical: 16 }}>
-              <View style={styles.upgradeCard}>
-                <Ionicons name="star" size={32} color="#3B82F6" />
-                <View style={styles.upgradeContent}>
-                  <Text style={styles.upgradeTitle}>Upgrade to Marketplace Access</Text>
-                  <Text style={styles.upgradeText}>
-                    Complete KYC verification to access shifts from all employers on the marketplace.
-                  </Text>
-                  <Button
-                    mode="contained"
-                    onPress={() => router.push('/worker/kyc-upgrade')}
-                    style={{ marginTop: 12, backgroundColor: '#3B82F6' }}
-                    icon="arrow-forward"
-                  >
-                    Start KYC Verification
-                  </Button>
-                </View>
               </View>
-            </Card.Content>
-          </Card>
+            </View>
+          </PanelPurple>
         )}
 
-        {/* Reviews */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title 
-            title={`Reviews (${profile.total_reviews || 0})`} 
-            titleStyle={{ fontSize: 16, fontWeight: 'bold' }} 
-          />
-          <Card.Content>
+        <PanelPurple style={{ alignItems: 'center', paddingVertical: 24 }}>
+          {profile.profile_photo_url ? (
+            <Image source={{ uri: profile.profile_photo_url }} style={styles.profilePhoto} />
+          ) : (
+            <View style={styles.avatarCircle}>
+              <Ionicons name="person" size={32} color="#3B82F6" />
+            </View>
+          )}
+          <Text style={styles.nameText}>{profile.full_name || 'Worker'}</Text>
+          <Text style={styles.roleText}>Flexi worker</Text>
+          <View style={styles.ratingRow}>
+            <Ionicons name="star" size={18} color="#FBBF24" />
+            <Text style={styles.ratingText}>{profile.average_rating != null ? profile.average_rating.toFixed(1) : '–'}</Text>
+            <Text style={styles.ratingCount}>({profile.total_reviews || 0} reviews)</Text>
+          </View>
+        </PanelPurple>
+
+        <PanelBlue>
+          <Text style={styles.cardTitle}>Contact</Text>
+          <View style={styles.row}><Ionicons name="mail-outline" size={18} color="#2563EB" /><Text style={styles.rowLabel}>Email</Text><Text style={styles.rowValue}>{profile.email || 'Not set'}</Text></View>
+          <View style={styles.row}><Ionicons name="call-outline" size={18} color="#2563EB" /><Text style={styles.rowLabel}>Phone</Text><Text style={styles.rowValue}>{profile.phone || 'Not set'}</Text></View>
+          <View style={styles.row}><Ionicons name="location-outline" size={18} color="#2563EB" /><Text style={styles.rowLabel}>Base location</Text><Text style={styles.rowValue}>{profile.location || 'Not set'}</Text></View>
+        </PanelBlue>
+
+        <PanelPurple>
+          <Text style={styles.cardTitle}>Work preferences</Text>
+          <View style={styles.row}><Ionicons name="briefcase-outline" size={18} color="#7C3AED" /><Text style={styles.rowLabel}>Experience level</Text><Text style={styles.rowValue}>{profile.experience_level || 'Any / not set'}</Text></View>
+          <View style={styles.row}><Ionicons name="pin-outline" size={18} color="#7C3AED" /><Text style={styles.rowLabel}>Preferred area</Text><Text style={styles.rowValue}>{profile.preferred_location || 'Any / not set'}</Text></View>
+          <View style={styles.skillsBlock}>
+            <Text style={styles.sectionLabel}>Skills</Text>
+            {profile.skills ? <Text style={styles.skillsText}>{profile.skills}</Text> : <Text style={styles.emptySubText}>No skills added yet.</Text>}
+          </View>
+        </PanelPurple>
+
+        <PanelBlue>
+          <Text style={styles.cardTitle}>About you</Text>
+          <Text style={styles.bioText}>{profile.bio || 'Tell employers more about yourself in your bio.'}</Text>
+        </PanelBlue>
+
+        {profile.cv_url && (
+          <PanelBlue onPress={() => { if (Platform.OS === 'web') window.open(profile.cv_url!, '_blank'); else Alert.alert('CV', 'View CV in browser: ' + profile.cv_url); }}>
+            <Text style={styles.cardTitle}>CV / Resume</Text>
+            <View style={styles.cvButton}>
+              <Ionicons name="document-text" size={20} color="#2563EB" />
+              <Text style={styles.cvButtonText}>View CV / Resume</Text>
+              <Ionicons name="open-outline" size={18} color="#2563EB" />
+            </View>
+          </PanelBlue>
+        )}
+
+        {(profile.marketplace_enabled === false && (profile.onboarding_type === 'employee' || profile.onboarding_type === null)) && (
+          <PanelBlue style={{ borderWidth: 2, borderColor: '#3B82F6' }}>
+            <View style={styles.upgradeCard}>
+              <Ionicons name="star" size={32} color="#3B82F6" />
+              <View style={styles.upgradeContent}>
+                <Text style={styles.upgradeTitle}>Upgrade to Marketplace Access</Text>
+                <Text style={styles.upgradeText}>Complete KYC verification to access shifts from all employers.</Text>
+                <TouchableOpacity onPress={() => router.push('/worker/kyc-upgrade')} style={styles.ctaBtn}>
+                  <Text style={styles.ctaBtnText}>Start KYC Verification</Text>
+                  <Ionicons name="arrow-forward" size={18} color="#FFF" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          </PanelBlue>
+        )}
+
+        <PanelPurple>
+          <Text style={styles.cardTitle}>Reviews ({profile.total_reviews || 0})</Text>
           {reviews.length === 0 && !reviewsLoading ? (
             <Text style={styles.emptySubText}>No reviews yet</Text>
           ) : (
             <>
-              {reviews.map((review) => (
-                <ReviewCard
-                  key={review.id}
-                  review={review}
-                  reviewerType="employer"
-                />
-              ))}
+              {reviews.map((review) => <ReviewCard key={review.id} review={review} reviewerType="employer" />)}
               {hasMoreReviews && (
-                <Button
-                  mode="text"
-                  onPress={loadMoreReviews}
-                  loading={reviewsLoading}
-                  disabled={reviewsLoading}
-                  style={{ marginTop: 8 }}
-                >
-                  Load More Reviews
-                </Button>
+                <Button mode="text" onPress={loadMoreReviews} loading={reviewsLoading} disabled={reviewsLoading} style={{ marginTop: 8 }}>Load More Reviews</Button>
               )}
             </>
           )}
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
-        {/* Notifications */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title 
-            title="Notifications" 
-            titleStyle={{ fontSize: 16, fontWeight: 'bold' }} 
-          />
-          <Card.Content style={{ paddingVertical: 8 }}>
-            <NotificationList userId={profile.id} limit={10} />
-          </Card.Content>
-        </Card>
+        <PanelPurple>
+          <Text style={styles.cardTitle}>Notifications</Text>
+          <NotificationList userId={profile.id} limit={10} />
+        </PanelPurple>
 
-        {/* Settings */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title 
-            title="Settings" 
-            titleStyle={{ fontSize: 16, fontWeight: 'bold' }} 
-          />
-          <Card.Content>
-            <TouchableOpacity
-              style={styles.settingsItem}
-              onPress={() => router.push('/worker/settings')}
-            >
-              <Ionicons name="notifications-outline" size={20} color="#3B82F6" />
-              <Text style={styles.settingsItemText}>Notification Settings</Text>
-              <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-            </TouchableOpacity>
-          </Card.Content>
-        </Card>
+        <PanelBlue onPress={() => router.push('/worker/settings')}>
+          <Text style={styles.cardTitle}>Settings</Text>
+          <View style={styles.settingsItem}>
+            <Ionicons name="notifications-outline" size={20} color="#2563EB" />
+            <Text style={styles.settingsItemText}>Notification Settings</Text>
+            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+          </View>
+        </PanelBlue>
 
-        {/* Actions */}
         <View style={styles.actionsRow}>
-          <Button
-            mode="outlined"
-            onPress={() => router.push('/worker/edit-profile')}
-            icon="pencil"
-            style={{ flex: 1, marginRight: 8 }}
-            textColor="#3B82F6"
-            contentStyle={{ paddingVertical: 8 }}
-          >
-            Edit profile
-          </Button>
-
-          <Button
-            mode="contained"
-            onPress={handleLogout}
-            icon="logout"
-            buttonColor="#7C3AED"
-            style={{ flex: 1, marginLeft: 8 }}
-            contentStyle={{ paddingVertical: 8 }}
-          >
-            Logout
-          </Button>
+          <TouchableOpacity onPress={() => router.push('/worker/edit-profile')} style={styles.editBtn}>
+            <Ionicons name="pencil-outline" size={20} color="#2563EB" />
+            <Text style={styles.editBtnText}>Edit profile</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutBtnWrap}>
+            <LinearGradient colors={['#7C3AED', '#2563EB']} style={styles.logoutBtn}>
+              <Ionicons name="log-out-outline" size={20} color="#FFF" />
+              <Text style={styles.logoutBtnText}>Logout</Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
 
         <View style={{ height: 40 }} />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </ConstitutionalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
-  logo: { width: 32, height: 32 },
-
-  screen: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  header: {
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerBackButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
-  container: {
-    padding: 20,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#6B7280',
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#6B7280',
-    marginBottom: 12,
-  },
-  card: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
-  },
+  container: { paddingHorizontal: 4, paddingTop: 8 },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  loadingText: { marginTop: 10, fontSize: 16, color: 'rgba(255,255,255,0.9)' },
+  emptyText: { fontSize: 16, color: 'rgba(255,255,255,0.9)', marginBottom: 12 },
+  backButtonWrap: { paddingVertical: 12, alignItems: 'center' },
+  backButtonText: { fontSize: 16, fontWeight: '600', color: '#DBEAFE' },
+  cardTitle: { fontSize: 16, fontWeight: 'bold', color: '#111827', marginBottom: 12 },
+  ctaBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#3B82F6', paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12, marginTop: 12 },
+  ctaBtnText: { fontSize: 14, fontWeight: '600', color: '#FFF' },
+  editBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 14, borderWidth: 2, borderColor: '#2563EB', marginRight: 8 },
+  editBtnText: { fontSize: 14, fontWeight: '600', color: '#2563EB' },
+  logoutBtnWrap: { flex: 1, borderRadius: 16, overflow: 'hidden', marginLeft: 8 },
+  logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14 },
+  logoutBtnText: { fontSize: 14, fontWeight: '700', color: '#FFF' },
   avatarCircle: {
     width: 64,
     height: 64,
@@ -606,12 +397,6 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     fontSize: 12,
     color: '#B45309',
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 12,
   },
   row: {
     flexDirection: 'row',

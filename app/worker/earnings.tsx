@@ -8,12 +8,15 @@ import {
   Alert,
   RefreshControl,
   TouchableOpacity,
-ImageBackground, Image,
+  ImageBackground,
+  Image,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { PanelBlue, PanelPurple } from '../../components/ConstitutionalScreen';
 
 type PaymentRecord = {
   id: string;
@@ -187,114 +190,91 @@ export default function WorkerEarnings() {
 
   if (loading && !refreshing) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={styles.loadingText}>Loading earnings…</Text>
-      </View>
+      <ImageBackground source={require('../../assets/images/background.webp')} style={styles.container} resizeMode="cover">
+        <LinearGradient colors={['rgba(139, 92, 246, 0.95)', 'rgba(59, 130, 246, 0.92)']} style={StyleSheet.absoluteFillObject} />
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#FFF" />
+          <Text style={styles.loadingText}>Loading earnings…</Text>
+        </View>
+      </ImageBackground>
     );
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => router.replace('/worker')}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>My Earnings</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen
+      title="My Earnings"
+      showBack
+      onBack={() => router.replace('/worker')}
+      showLogo
+      scrollable={false}
+      contentStyle={{ flex: 1 }}
+    >
       <ScrollView
-        style={styles.container}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContentInner}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#FFF" />}
         showsVerticalScrollIndicator={false}
       >
-        {/* Earnings Summary Cards */}
+        {/* Színes kék/lila panelek – alkotmányos dizájn */}
         <View style={styles.summaryContainer}>
-          {/* Lifetime Earnings */}
-          <View style={styles.summaryCard}>
+          <PanelBlue style={styles.summaryCard}>
             <View style={styles.summaryCardHeader}>
-              <Ionicons name="trophy-outline" size={24} color="#3B82F6" />
+              <Ionicons name="trophy-outline" size={24} color="#2563EB" />
               <Text style={styles.summaryCardLabel}>Lifetime</Text>
             </View>
-            <Text style={styles.summaryCardValue}>
-              {formatCurrency(lifetimeEarnings)}
-            </Text>
-          </View>
-
-          {/* This Month */}
-          <View style={styles.summaryCard}>
+            <Text style={styles.summaryCardValue}>{formatCurrency(lifetimeEarnings)}</Text>
+          </PanelBlue>
+          <PanelPurple style={styles.summaryCard}>
             <View style={styles.summaryCardHeader}>
-              <Ionicons name="calendar-outline" size={24} color="#3B82F6" />
+              <Ionicons name="calendar-outline" size={24} color="#7C3AED" />
               <Text style={styles.summaryCardLabel}>This Month</Text>
             </View>
-            <Text style={styles.summaryCardValue}>
-              {formatCurrency(thisMonthEarnings)}
-            </Text>
-          </View>
-
-          {/* This Week */}
-          <View style={styles.summaryCard}>
+            <Text style={styles.summaryCardValuePurple}>{formatCurrency(thisMonthEarnings)}</Text>
+          </PanelPurple>
+          <PanelBlue style={styles.summaryCard}>
             <View style={styles.summaryCardHeader}>
-              <Ionicons name="time-outline" size={24} color="#3B82F6" />
+              <Ionicons name="time-outline" size={24} color="#2563EB" />
               <Text style={styles.summaryCardLabel}>This Week</Text>
             </View>
-            <Text style={styles.summaryCardValue}>
-              {formatCurrency(thisWeekEarnings)}
-            </Text>
-          </View>
+            <Text style={styles.summaryCardValue}>{formatCurrency(thisWeekEarnings)}</Text>
+          </PanelBlue>
         </View>
 
-        {/* Recent Payouts */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recent Payouts</Text>
 
           {payments.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Ionicons name="wallet-outline" size={48} color="#9CA3AF" />
-              <Text style={styles.emptyStateText}>
-                No payments yet
-              </Text>
-              <Text style={styles.emptyStateSubtext}>
-                Your earnings will appear here once shifts are completed and payments are released.
-              </Text>
-            </View>
+            <PanelBlue>
+              <View style={styles.emptyState}>
+                <Ionicons name="wallet-outline" size={48} color="#2563EB" />
+                <Text style={styles.emptyStateText}>No payments yet</Text>
+                <Text style={styles.emptyStateSubtext}>
+                  Your earnings will appear here once shifts are completed and payments are released.
+                </Text>
+              </View>
+            </PanelBlue>
           ) : (
             payments.map((payment) => (
-              <TouchableOpacity
+              <PanelPurple
                 key={payment.id}
-                style={styles.paymentCard}
                 onPress={() => router.push(`/worker/earning/${payment.id}?from=/worker/earnings`)}
               >
                 <View style={styles.paymentCardHeader}>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.paymentJobTitle}>
-                      {payment.shift?.job_title || 'Shift'}
-                    </Text>
+                    <Text style={styles.paymentJobTitle}>{payment.shift?.job_title || 'Shift'}</Text>
                     <Text style={styles.paymentDate}>
                       {formatDate(payment.shift?.shift_date || payment.released_at)}
                     </Text>
                   </View>
                   <View style={styles.paymentAmountContainer}>
-                    <Text style={styles.paymentAmount}>
-                      {formatCurrency(payment.worker_payout || 0)}
-                    </Text>
+                    <Text style={styles.paymentAmount}>{formatCurrency(payment.worker_payout || 0)}</Text>
                   </View>
                 </View>
-
                 <View style={styles.paymentDetails}>
                   <View style={styles.paymentDetailRow}>
                     <Ionicons name="cash-outline" size={16} color="#6B7280" />
                     <Text style={styles.paymentDetailLabel}>Platform fee:</Text>
-                    <Text style={styles.paymentDetailValue}>
-                      {formatCurrency(payment.platform_fee)}
-                    </Text>
+                    <Text style={styles.paymentDetailValue}>{formatCurrency(payment.platform_fee)}</Text>
                   </View>
                   <View style={styles.paymentDetailRow}>
                     <Ionicons name="checkmark-circle" size={16} color="#3B82F6" />
@@ -302,68 +282,31 @@ export default function WorkerEarnings() {
                     <Text style={styles.paymentStatus}>Released</Text>
                   </View>
                 </View>
-
                 <View style={styles.paymentCardFooter}>
                   <Text style={styles.viewDetailsText}>View details</Text>
                   <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
                 </View>
-              </TouchableOpacity>
+              </PanelPurple>
             ))
           )}
         </View>
 
         <View style={{ height: 32 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
-  logo: { width: 32, height: 32 },
-
-  screen: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
+  container: { flex: 1 },
   center: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: 'transparent',
   },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#6B7280',
-  },
-  header: {
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerBackButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
-  container: {
-    flex: 1,
-    padding: 20,
-  },
+  loadingText: { marginTop: 10, fontSize: 16, color: 'rgba(255,255,255,0.9)' },
+  scrollContentInner: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 32 },
   summaryContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -372,15 +315,8 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     flex: 1,
-    minWidth: '30%',
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 12,
+    minWidth: 100,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
   },
   summaryCardHeader: {
     flexDirection: 'row',
@@ -391,20 +327,15 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 12,
     fontWeight: '600',
-    color: '#6B7280',
+    color: '#475569',
   },
-  summaryCardValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#3B82F6',
-  },
-  section: {
-    marginBottom: 24,
-  },
+  summaryCardValue: { fontSize: 20, fontWeight: 'bold', color: '#2563EB' },
+  summaryCardValuePurple: { fontSize: 20, fontWeight: 'bold', color: '#7C3AED' },
+  section: { marginBottom: 24 },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#111827',
+    color: '#FFFFFF',
     marginBottom: 16,
   },
   emptyState: {
@@ -427,15 +358,17 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   paymentCard: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     padding: 16,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.15)',
+    shadowColor: '#7C3AED',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
   },
   paymentCardHeader: {
     flexDirection: 'row',

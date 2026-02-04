@@ -10,7 +10,7 @@ import {
   Switch,
   Image,
   Platform,
-ImageBackground,
+  ImageBackground,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -19,6 +19,7 @@ import { Button } from 'react-native-paper';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { uploadDocument, pickDocument, uploadWorkerProfilePhoto, pickImage } from '../../services/file-upload';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../components/ConstitutionalScreen';
 
 type WorkerProfile = {
   id: string;
@@ -267,275 +268,103 @@ export default function EditWorkerProfileScreen() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#3B82F6" />
-        <Text style={styles.loadingText}>Loading…</Text>
-      </View>
+      <ConstitutionalScreen title="Edit profile" showBack onBack={() => router.back()} showLogo>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#7C3AED" />
+          <Text style={styles.loadingText}>Loading profile…</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.replace('/worker/profile')} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Edit profile</Text>
-        <View style={{ width: 40 }} />
-      </View>
+    <ConstitutionalScreen title="Edit profile" showBack onBack={() => router.back()} showLogo>
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.formContainer} showsVerticalScrollIndicator={false}>
+        <PanelPurple>
+          <Text style={styles.sectionTitle}>Basic info</Text>
+          <TextInput label="Full name *" value={fullName} onChangeText={setFullName} mode="outlined" style={styles.input} outlineColor="#E9D5FF" activeOutlineColor="#7C3AED" />
+          <TextInput label="Email" value={email} onChangeText={setEmail} mode="outlined" keyboardType="email-address" autoCapitalize="none" style={styles.input} outlineColor="#E9D5FF" activeOutlineColor="#7C3AED" />
+          <TextInput label="Phone" value={phone} onChangeText={setPhone} mode="outlined" keyboardType="phone-pad" style={styles.input} outlineColor="#E9D5FF" activeOutlineColor="#7C3AED" />
+          <TextInput label="Location (city / area)" value={location} onChangeText={setLocation} mode="outlined" style={styles.input} outlineColor="#E9D5FF" activeOutlineColor="#7C3AED" />
+        </PanelPurple>
 
-      <View style={styles.formContainer}>
-        {/* Basic info */}
-        <Text style={styles.sectionTitle}>Basic info</Text>
-
-        <TextInput
-          label="Full name *"
-          value={fullName}
-          onChangeText={setFullName}
-          mode="outlined"
-          style={styles.input}
-        />
-
-        <TextInput
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          mode="outlined"
-          keyboardType="email-address"
-          autoCapitalize="none"
-          style={styles.input}
-        />
-
-        <TextInput
-          label="Phone"
-          value={phone}
-          onChangeText={setPhone}
-          mode="outlined"
-          keyboardType="phone-pad"
-          style={styles.input}
-        />
-
-        <TextInput
-          label="Location (city / area)"
-          value={location}
-          onChangeText={setLocation}
-          mode="outlined"
-          style={styles.input}
-        />
-
-        {/* Profile Photo Upload Section */}
-        <Text style={styles.sectionTitle}>Upload your photo</Text>
-        <View style={styles.uploadSection}>
-          {profilePhotoUrl ? (
-            <View style={styles.imagePreview}>
-              <Image source={{ uri: profilePhotoUrl }} style={styles.previewImage} />
-              <TouchableOpacity
-                style={styles.removeButton}
-                onPress={() => setProfilePhotoUrl(null)}
-              >
-                <Ionicons name="close-circle" size={24} color="#7C3AED" />
-              </TouchableOpacity>
-            </View>
-          ) : null}
-          <Button
-            mode="outlined"
-            onPress={handlePickProfilePhoto}
-            loading={uploadingPhoto}
-            disabled={uploadingPhoto}
-            icon="camera"
-            style={{ marginVertical: 8 }}
-          >
-            {profilePhotoUrl ? 'Change photo' : 'Upload your photo'}
-          </Button>
-        </View>
-
-        {/* Work info */}
-        <Text style={styles.sectionTitle}>Work info</Text>
-
-        <TextInput
-          label="Experience level"
-          value={experienceLevel}
-          onChangeText={setExperienceLevel}
-          mode="outlined"
-          style={styles.input}
-        />
-
-        <TextInput
-          label="Job types you want"
-          value={jobTypes}
-          onChangeText={setJobTypes}
-          mode="outlined"
-          style={styles.input}
-        />
-
-        <TextInput
-          label="Preferred location"
-          value={preferredLocation}
-          onChangeText={setPreferredLocation}
-          mode="outlined"
-          style={styles.input}
-        />
-
-        <TextInput
-          label="Preferred area (district / mall)"
-          value={preferredArea}
-          onChangeText={setPreferredArea}
-          mode="outlined"
-          style={styles.input}
-        />
-
-        <TextInput
-          label="Availability (days / time)"
-          value={availability}
-          onChangeText={setAvailability}
-          mode="outlined"
-          style={styles.input}
-        />
-
-        {/* Work permit */}
-        <View style={styles.switchRow}>
-          <View>
-            <Text style={styles.label}>I have a valid work permit</Text>
-            <Text style={styles.helperText}>
-              This helps us show you only legal work options.
-            </Text>
+        <PanelBlue>
+          <Text style={styles.sectionTitle}>Upload your photo</Text>
+          <View style={styles.uploadSection}>
+            {profilePhotoUrl ? (
+              <View style={styles.imagePreview}>
+                <Image source={{ uri: profilePhotoUrl }} style={styles.previewImage} />
+                <TouchableOpacity style={styles.removeButtonImage} onPress={() => setProfilePhotoUrl(null)}>
+                  <Ionicons name="close-circle" size={24} color="#7C3AED" />
+                </TouchableOpacity>
+              </View>
+            ) : null}
+            <Button mode="outlined" onPress={handlePickProfilePhoto} loading={uploadingPhoto} disabled={uploadingPhoto} icon="camera" style={{ marginVertical: 8 }} textColor="#2563EB">
+              {profilePhotoUrl ? 'Change photo' : 'Upload your photo'}
+            </Button>
           </View>
-          <Switch
-            value={hasWorkPermit}
-            onValueChange={setHasWorkPermit}
-            trackColor={{ false: '#E5E7EB', true: '#FDBA74' }}
-            thumbColor={hasWorkPermit ? '#3B82F6' : '#F9FAFB'}
-          />
-        </View>
+        </PanelBlue>
 
-        {/* Skills & bio */}
-        <Text style={styles.sectionTitle}>Skills & bio</Text>
-
-        <TextInput
-          label="Skills"
-          value={skills}
-          onChangeText={setSkills}
-          mode="outlined"
-          style={styles.input}
-        />
-
-        <TextInput
-          label="About you"
-          value={bio}
-          onChangeText={setBio}
-          mode="outlined"
-          multiline
-          numberOfLines={4}
-          style={styles.input}
-        />
-
-        {/* CV Upload Section */}
-        <Text style={styles.sectionTitle}>CV / Resume</Text>
-        <View style={styles.uploadSection}>
-          {cvUrl ? (
-            <View style={styles.documentPreview}>
-              <Ionicons name="document-text" size={24} color="#3B82F6" />
-              <Text style={styles.documentName} numberOfLines={1}>
-                CV uploaded
-              </Text>
-              <TouchableOpacity
-                style={styles.viewButton}
-                onPress={() => {
-                  // Open document in browser
-                  if (Platform.OS === 'web') {
-                    window.open(cvUrl, '_blank');
-                  } else {
-                    Alert.alert('CV', 'View CV in browser: ' + cvUrl);
-                  }
-                }}
-              >
-                <Text style={styles.viewButtonText}>View</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.removeButton}
-                onPress={() => setCvUrl(null)}
-              >
-                <Ionicons name="close-circle" size={24} color="#7C3AED" />
-              </TouchableOpacity>
+        <PanelPurple>
+          <Text style={styles.sectionTitle}>Work info</Text>
+          <TextInput label="Experience level" value={experienceLevel} onChangeText={setExperienceLevel} mode="outlined" style={styles.input} outlineColor="#E9D5FF" activeOutlineColor="#7C3AED" />
+          <TextInput label="Job types you want" value={jobTypes} onChangeText={setJobTypes} mode="outlined" style={styles.input} outlineColor="#E9D5FF" activeOutlineColor="#7C3AED" />
+          <TextInput label="Preferred location" value={preferredLocation} onChangeText={setPreferredLocation} mode="outlined" style={styles.input} outlineColor="#E9D5FF" activeOutlineColor="#7C3AED" />
+          <TextInput label="Preferred area (district / mall)" value={preferredArea} onChangeText={setPreferredArea} mode="outlined" style={styles.input} outlineColor="#E9D5FF" activeOutlineColor="#7C3AED" />
+          <TextInput label="Availability (days / time)" value={availability} onChangeText={setAvailability} mode="outlined" style={styles.input} outlineColor="#E9D5FF" activeOutlineColor="#7C3AED" />
+          <View style={styles.switchRow}>
+            <View>
+              <Text style={styles.label}>I have a valid work permit</Text>
+              <Text style={styles.helperText}>This helps us show you only legal work options.</Text>
             </View>
-          ) : null}
-          <Button
-            mode="outlined"
-            onPress={handlePickCV}
-            loading={uploadingCv}
-            disabled={uploadingCv}
-            icon="file-document"
-            style={{ marginVertical: 8 }}
-          >
-            {cvUrl ? 'Replace CV' : 'Upload CV / Resume'}
-          </Button>
-        </View>
+            <Switch value={hasWorkPermit} onValueChange={setHasWorkPermit} trackColor={{ false: '#E5E7EB', true: '#A855F7' }} thumbColor={hasWorkPermit ? '#7C3AED' : '#F9FAFB'} />
+          </View>
+        </PanelPurple>
 
-        {/* Save button */}
-        <Button
-          mode="contained"
-          onPress={handleSave}
-          loading={saving}
-          disabled={saving}
-          icon="content-save"
-          style={{ marginVertical: 16 }}
-          contentStyle={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 8 }}
-        >
-          Save changes
-        </Button>
+        <PanelBlue>
+          <Text style={styles.sectionTitle}>Skills & bio</Text>
+          <TextInput label="Skills" value={skills} onChangeText={setSkills} mode="outlined" style={styles.input} outlineColor="#BFDBFE" activeOutlineColor="#2563EB" />
+          <TextInput label="About you" value={bio} onChangeText={setBio} mode="outlined" multiline numberOfLines={4} style={[styles.input, styles.textArea]} outlineColor="#BFDBFE" activeOutlineColor="#2563EB" />
+        </PanelBlue>
+
+        <PanelBlue>
+          <Text style={styles.sectionTitle}>CV / Resume</Text>
+          <View style={styles.uploadSection}>
+            {cvUrl ? (
+              <View style={styles.documentPreview}>
+                <Ionicons name="document-text" size={24} color="#2563EB" />
+                <Text style={styles.documentName} numberOfLines={1}>CV uploaded</Text>
+                <TouchableOpacity style={styles.viewButton} onPress={() => { if (Platform.OS === 'web') window.open(cvUrl!, '_blank'); else Alert.alert('CV', 'View CV in browser: ' + cvUrl); }}>
+                  <Text style={styles.viewButtonText}>View</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.removeButton} onPress={() => setCvUrl(null)}>
+                  <Ionicons name="close-circle" size={24} color="#7C3AED" />
+                </TouchableOpacity>
+              </View>
+            ) : null}
+            <Button mode="outlined" onPress={handlePickCV} loading={uploadingCv} disabled={uploadingCv} icon="file-document" style={{ marginVertical: 8 }} textColor="#2563EB">
+              {cvUrl ? 'Replace CV' : 'Upload CV / Resume'}
+            </Button>
+          </View>
+        </PanelBlue>
+
+        <TouchableOpacity onPress={handleSave} disabled={saving} style={styles.saveButtonWrap}>
+          <LinearGradient colors={['#7C3AED', '#2563EB']} style={styles.saveButton}>
+            {saving ? <ActivityIndicator color="#FFF" /> : <Ionicons name="save-outline" size={22} color="#FFF" />}
+            <Text style={styles.saveButtonText}>{saving ? 'Saving…' : 'Save changes'}</Text>
+          </LinearGradient>
+        </TouchableOpacity>
 
         <View style={{ height: 32 }} />
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </ConstitutionalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
-  logo: { width: 32, height: 32 },
-
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'transparent',
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#6B7280',
-  },
-  header: {
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
-  formContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-  },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  loadingText: { marginTop: 10, fontSize: 16, color: 'rgba(255,255,255,0.9)' },
+  formContainer: { paddingHorizontal: 4, paddingTop: 8 },
   sectionTitle: {
     marginTop: 16,
     marginBottom: 8,
@@ -590,13 +419,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#3B82F6',
   },
-  removeButton: {
-    position: 'absolute',
-    top: -8,
-    right: -8,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 12,
-  },
+  removeButtonImage: { position: 'absolute', top: -8, right: -8, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 12 },
+  removeButton: { padding: 4 },
   documentPreview: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -622,20 +446,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
-  removeButton: {
-    padding: 4,
-  },
-  saveButton: {
-    marginTop: 24,
-    backgroundColor: '#3B82F6',
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  saveButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+  saveButtonWrap: { marginTop: 24, borderRadius: 16, overflow: 'hidden', shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6 },
+  saveButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16 },
+  saveButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
 });
