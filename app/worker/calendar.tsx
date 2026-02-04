@@ -79,7 +79,7 @@ export default function WorkerCalendar() {
 
       if (userError || !user) {
         Alert.alert('Error', 'Please login again');
-        router.replace('/auth/login');
+        router.replace('/auth/select-user-type');
         return;
       }
 

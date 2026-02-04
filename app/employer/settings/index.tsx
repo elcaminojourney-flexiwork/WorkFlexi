@@ -14,7 +14,7 @@ export default function SettingsPage() {
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure?', [
       { text: 'Cancel', style: 'cancel' },
-      { text: 'Logout', style: 'destructive', onPress: async () => { setLoggingOut(true); await supabase.auth.signOut(); router.replace('/auth/login'); }},
+      { text: 'Logout', style: 'destructive', onPress: async () => { setLoggingOut(true); await supabase.auth.signOut(); router.replace('/auth/select-user-type'); }},
     ]);
   };
 

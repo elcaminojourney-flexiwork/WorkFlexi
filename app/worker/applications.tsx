@@ -27,7 +27,7 @@ export default function WorkerApplicationsPage() {
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace('/auth/login'); return; }
+      if (!user) { router.replace('/auth/select-user-type'); return; }
 
       const { data } = await supabase
         .from('shift_applications')

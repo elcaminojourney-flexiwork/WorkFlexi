@@ -22,7 +22,7 @@ export default function ApplicationsPage() {
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace('/auth/login'); return; }
+      if (!user) { router.replace('/auth/select-user-type'); return; }
       const { data } = await supabase.from('shift_applications').select('id, shift_id, worker_id, status, created_at, shifts(title), profiles!shift_applications_worker_id_fkey(full_name)').eq('shifts.employer_id', user.id).order('created_at', { ascending: false });
       setApps((data || []).map((a: any) => ({ id: a.id, shift_id: a.shift_id, worker_id: a.worker_id, status: a.status, worker_name: a.profiles?.full_name, shift_title: a.shifts?.title, created_at: a.created_at })));
     } catch (e) { Alert.alert('Error', 'Failed'); } finally { setLoading(false); setRefreshing(false); }

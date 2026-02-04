@@ -74,7 +74,7 @@ export default function PostShift() {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace('/auth/login'); return; }
+      if (!user) { router.replace('/auth/select-user-type'); return; }
 
       const calc = calculateShiftDetails();
       const { data: shift, error } = await supabase.from('shifts').insert([{

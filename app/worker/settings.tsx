@@ -22,7 +22,7 @@ export default function WorkerSettingsPage() {
       { text: 'Logout', style: 'destructive', onPress: async () => {
         setLoggingOut(true);
         await supabase.auth.signOut();
-        router.replace('/auth/login');
+        router.replace('/auth/select-user-type');
       }},
     ]);
   };

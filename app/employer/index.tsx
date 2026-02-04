@@ -20,7 +20,7 @@ export default function EmployerDashboard() {
   const loadData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace('/auth/login'); return; }
+      if (!user) { router.replace('/auth/select-user-type'); return; }
       const { data: p } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       setProfile(p);
       const { count: sc } = await supabase.from('shifts').select('*', { count: 'exact', head: true }).eq('employer_id', user.id).eq('status', 'open');

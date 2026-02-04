@@ -20,7 +20,7 @@ export default function WorkerDashboard() {
   const loadData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace('/auth/login'); return; }
+      if (!user) { router.replace('/auth/select-user-type'); return; }
       const { data: p } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       setProfile(p);
       const { count: pc } = await supabase.from('shift_applications').select('*', { count: 'exact', head: true }).eq('worker_id', user.id).eq('status', 'pending');

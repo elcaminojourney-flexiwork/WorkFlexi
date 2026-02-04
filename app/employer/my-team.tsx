@@ -22,7 +22,7 @@ export default function MyTeamPage() {
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.replace('/auth/login'); return; }
+      if (!user) { router.replace('/auth/select-user-type'); return; }
       const { data: workers } = await supabase.from('profiles').select('id, full_name, email, employed_by').eq('user_type', 'worker');
       const team = (workers || []).map((w) => {
         const emp = (w.employed_by || []).find((e: any) => e.employer_id === user.id);
