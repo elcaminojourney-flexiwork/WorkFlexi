@@ -34,7 +34,7 @@ export default function WorkerSettingsPage() {
 
   return (
     <ConstitutionalScreen title="Settings" showBack onBack={() => router.back()} showLogo showFooter>
-      <CardWhite style={styles.menuCard}>
+      <PanelPurple style={styles.menuCard}>
         {menuItems.map((item, index) => (
           <TouchableOpacity
             key={index}
