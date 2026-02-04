@@ -11,8 +11,9 @@ ImageBackground,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Card, Chip } from 'react-native-paper';
+import { Chip } from 'react-native-paper';
 import { supabase } from '../../../../supabase';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../../../components/ConstitutionalScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { calculateHoursFromTimes } from '../../../../services/timesheets';
 
@@ -320,25 +321,16 @@ export default function TimesheetEarningDetails() {
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/worker/my-shifts');
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Earning Summary</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen
+      title="Earning Summary"
+      showBack
+      onBack={() => {
+        if (from && typeof from === 'string') router.replace(from as any);
+        else router.replace('/worker/my-shifts');
+      }}
+      showLogo
+      theme="light"
+    >
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Earning Header */}
         <View style={styles.earningHeader}>
@@ -358,26 +350,24 @@ export default function TimesheetEarningDetails() {
 
         {/* Employer Info */}
         {employer && (
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="FROM" titleStyle={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280' }} />
-            <Card.Content>
-              <Text style={styles.companyName}>
-                {employer.company_name || 'Employer'}
-              </Text>
-              {employer.location && (
-                <Text style={styles.companyEmail}>{employer.location}</Text>
-              )}
-              {employer.phone && (
-                <Text style={styles.companyEmail}>{employer.phone}</Text>
-              )}
-            </Card.Content>
-          </Card>
+          <PanelBlue style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280', marginBottom: 8 }}>FROM</Text>
+            <Text style={styles.companyName}>
+              {employer.company_name || 'Employer'}
+            </Text>
+            {employer.location && (
+              <Text style={styles.companyEmail}>{employer.location}</Text>
+            )}
+            {employer.phone && (
+              <Text style={styles.companyEmail}>{employer.phone}</Text>
+            )}
+          </PanelBlue>
         )}
 
         {/* Worker Info */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="PAID TO" titleStyle={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280' }} />
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280', marginBottom: 8 }}>PAID TO</Text>
+          <View>
             <Text style={styles.workerName}>
               {worker?.full_name || 'Worker'}
             </Text>
@@ -392,14 +382,14 @@ export default function TimesheetEarningDetails() {
                 Bank: ****{worker.bank_account_number.slice(-4)}
               </Text>
             )}
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelPurple>
 
         {/* Shift Details */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Shift Details" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-          <View style={styles.detailRow}>
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Shift Details</Text>
+          <View>
+            <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Job Title:</Text>
             <Text style={styles.detailValue}>
               {shift.job_title || 'Shift'}
@@ -427,14 +417,14 @@ export default function TimesheetEarningDetails() {
               </Text>
             </View>
           )}
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelBlue>
 
         {/* Time Breakdown */}
         {timesheet && paymentData && (
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="TIME BREAKDOWN" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content>
+          <PanelPurple style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>TIME BREAKDOWN</Text>
+            <View>
               {timesheet.clock_in_time && (
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>Clock in:</Text>
@@ -484,14 +474,14 @@ export default function TimesheetEarningDetails() {
                   </Text>
                 </View>
               )}
-            </Card.Content>
-          </Card>
+            </View>
+          </PanelPurple>
         )}
 
         {/* Payment Breakdown */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="PAYMENT BREAKDOWN" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>PAYMENT BREAKDOWN</Text>
+          <View>
 
           <View style={styles.breakdownRow}>
             <Text style={styles.breakdownLabel}>
@@ -521,12 +511,12 @@ export default function TimesheetEarningDetails() {
               {formatCurrency(paymentData.workerPayout)}
             </Text>
           </View>
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelBlue>
 
         {/* Payment Status */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <View>
             <View style={styles.statusRow}>
               <Text style={styles.statusLabel}>Payment Status:</Text>
               <Chip
@@ -550,12 +540,12 @@ export default function TimesheetEarningDetails() {
             <Text style={styles.thankYouText}>
               Thank you for using FlexiWork! 🚀
             </Text>
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelPurple>
 
         <View style={{ height: 32 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

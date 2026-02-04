@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ScrollView, ImageBackground,
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ImageBackground,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Button, TextInput } from 'react-native-paper';
 import { supabase } from '../../supabase';
+import ConstitutionalScreen from '../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -375,19 +375,16 @@ export default function WorkerOnboardingPage() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ConstitutionalScreen title="Complete Your Profile" showBack={false} showLogo theme="light">
       <View style={styles.content}>
-        <Text style={styles.title}>Complete Your Profile</Text>
         <Text style={styles.subtitle}>Step {step} of 4</Text>
-
         {renderStepIndicator()}
-
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
         {step === 3 && renderStep3()}
         {step === 4 && renderStep4()}
       </View>
-    </ScrollView>
+    </ConstitutionalScreen>
   );
 }
 
@@ -402,15 +399,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
-    paddingTop: 60,
     paddingBottom: 40,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1E293B',
-    textAlign: 'center',
-    marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,

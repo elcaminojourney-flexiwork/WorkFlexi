@@ -7,13 +7,12 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
-ImageBackground, Image,
+  Platform,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Card } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../supabase';
+import ConstitutionalScreen, { PanelPurple } from '../../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -184,31 +183,20 @@ export default function DisputeTimesheet() {
     }
   };
 
-  return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else if (timesheetId) {
-              router.replace(`/employer/timesheet/${timesheetId}`);
-            } else {
-              router.replace('/employer/my-shifts');
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Dispute timesheet</Text>
-        <View style={{ width: 40 }} />
-      </View>
+  const handleBack = () => {
+    if (from && typeof from === 'string') {
+      router.replace(from as any);
+    } else if (timesheetId) {
+      router.replace(`/employer/timesheet/${timesheetId}`);
+    } else {
+      router.replace('/employer/my-shifts');
+    }
+  };
 
+  return (
+    <ConstitutionalScreen title="Dispute timesheet" showBack onBack={handleBack} showLogo theme="light">
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
             <Text style={styles.title}>Why are you disputing this timesheet?</Text>
             <Text style={styles.subText}>
               Payment will be held until our team reviews this case. Workers cannot
@@ -272,7 +260,7 @@ export default function DisputeTimesheet() {
 
         <View style={{ height: 24 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

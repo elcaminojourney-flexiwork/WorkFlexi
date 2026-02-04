@@ -10,22 +10,19 @@ import {
   Alert,
   Modal,
   RefreshControl,
-  ImageBackground,
-  Image,
   Platform,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../supabase';
-import { palette, colors, gradients, typography, spacing, borderRadius, shadows, getStatusColor } from '../../../constants/theme';
+import { palette, colors, typography, spacing, borderRadius, shadows } from '../../../constants/theme';
 import { 
   inviteTeamMember, 
   getTeamMembersByOrganisation,
-  updateTeamMemberRoles,
   terminateTeamMember,
   resendInvite,
 } from '../../../services/team';
+import ConstitutionalScreen, { CardWhite } from '../../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -263,45 +260,33 @@ export default function TeamManagement() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={palette.purple[500]} />
-        <Text style={styles.loadingText}>Loading team...</Text>
-      </View>
+      <ConstitutionalScreen title="Team" showBack onBack={() => router.back()} showLogo theme="light">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={palette.purple[500]} />
+          <Text style={styles.loadingText}>Loading team...</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <LinearGradient colors={gradients.employer} style={styles.header}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={palette.white} />
-          </TouchableOpacity>
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerTitle}>Team</Text>
-            <Text style={styles.headerSubtitle}>{organisation?.name}</Text>
-          </View>
-          <TouchableOpacity 
-            onPress={() => setShowInviteModal(true)}
-            style={styles.addButton}
-          >
-            <Ionicons name="person-add" size={24} color={palette.white} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Search */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color={palette.gray[400]} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search team members..."
-            placeholderTextColor={palette.gray[400]}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-      </LinearGradient>
+    <ConstitutionalScreen title={organisation?.name || 'Team'} showBack onBack={() => router.back()} showLogo theme="light" scrollable={false}>
+      <View style={styles.inviteRow}>
+        <TouchableOpacity onPress={() => setShowInviteModal(true)} style={styles.inviteButton}>
+          <Ionicons name="person-add" size={20} color="#FFFFFF" />
+          <Text style={styles.inviteButtonText}>Invite Team Member</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={20} color={palette.gray[400]} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search team members..."
+          placeholderTextColor={palette.gray[400]}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
 
       {/* Filter Tabs */}
       <View style={styles.filterTabs}>
@@ -349,7 +334,7 @@ export default function TeamManagement() {
           filteredMembers.map((member) => {
             const statusStyle = getStatusBadgeStyle(member.status);
             return (
-              <TouchableOpacity
+              <CardWhite
                 key={member.id}
                 style={styles.memberCard}
                 onPress={() => router.push(`/employer/rota/team/${member.id}?organisationId=${organisationId}`)}
@@ -388,7 +373,7 @@ export default function TeamManagement() {
                     <Ionicons name="refresh" size={20} color={palette.purple[500]} />
                   </TouchableOpacity>
                 )}
-              </TouchableOpacity>
+              </CardWhite>
             );
           })
         )}
@@ -545,7 +530,7 @@ export default function TeamManagement() {
           </ScrollView>
         </View>
       </Modal>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 
@@ -569,7 +554,7 @@ const styles = StyleSheet.create({
   searchContainer: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: borderRadius.lg, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
   searchInput: { flex: 1, marginLeft: spacing.sm, color: palette.white, fontSize: typography.sizes.body },
   
-  filterTabs: { flexDirection: 'row', backgroundColor: colors.surface, paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
+  filterTabs: { flexDirection: 'row', backgroundColor: '#FFFFFF', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
   filterTab: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: spacing.md, paddingVertical: spacing.sm, marginRight: spacing.sm, borderRadius: borderRadius.full },
   filterTabActive: { backgroundColor: palette.purple[100] },
   filterTabText: { fontSize: typography.sizes.body, color: colors.textSecondary },
@@ -585,7 +570,7 @@ const styles = StyleSheet.create({
   emptyStateButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: palette.purple[500], paddingHorizontal: spacing.lg, paddingVertical: spacing.md, borderRadius: borderRadius.lg, marginTop: spacing.lg, gap: spacing.sm },
   emptyStateButtonText: { color: palette.white, fontWeight: typography.weights.semibold },
   
-  memberCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, borderRadius: borderRadius.lg, padding: spacing.md, marginBottom: spacing.sm, ...shadows.sm },
+  memberCard: { flexDirection: 'row', alignItems: 'center', padding: spacing.md, marginBottom: spacing.sm },
   memberAvatar: { width: 48, height: 48, borderRadius: borderRadius.full, backgroundColor: palette.purple[100], justifyContent: 'center', alignItems: 'center' },
   memberInitials: { fontSize: typography.sizes.body, fontWeight: typography.weights.bold, color: palette.purple[600] },
   memberInfo: { flex: 1, marginLeft: spacing.md },

@@ -11,9 +11,10 @@ ImageBackground, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button, Card } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { PanelPurple } from '../../components/ConstitutionalScreen';
 import { createNotification, createNotifications } from '../../services/notifications';
 
 
@@ -381,27 +382,15 @@ export default function WorkerProfileView() {
     );
   }
 
-  return (
-    <ScrollView style={styles.container}>
-      {/* HEADER */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          // Go back to applications or wherever we came from
-          if (from && typeof from === 'string') {
-            router.replace(from as any);
-          } else {
-            router.replace('/employer/applications');
-          }
-        }}>
-          <Ionicons name="arrow-back" size={28} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Worker Profile</Text>
-        <View style={{ width: 28 }} />
-      </View>
+  const onBack = () => {
+    if (from && typeof from === 'string') router.replace(from as any);
+    else router.replace('/employer/applications');
+  };
 
-      {/* WORKER CARD */}
-      <Card mode="elevated" style={{ marginBottom: 12 }}>
-        <Card.Content>
+  return (
+    <ConstitutionalScreen title="Worker Profile" showBack onBack={onBack} showLogo theme="light">
+      <ScrollView style={styles.container}>
+      <PanelPurple style={{ marginBottom: 12 }}>
           <Text style={styles.nameText}>
             {profile.full_name || 'Unnamed Worker'}
           </Text>
@@ -426,8 +415,7 @@ export default function WorkerProfileView() {
                 : profile.skills || 'Not listed'}
             </Text>
           </View>
-        </Card.Content>
-      </Card>
+      </PanelPurple>
 
       {/* FAVORITES BUTTON */}
       <View style={styles.favoritesContainer}>
@@ -481,6 +469,7 @@ export default function WorkerProfileView() {
 
       <View style={{ height: 40 }} />
     </ScrollView>
+    </ConstitutionalScreen>
   );
 }
 

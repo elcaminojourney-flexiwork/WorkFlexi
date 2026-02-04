@@ -7,14 +7,14 @@ import {
   ActivityIndicator,
   Alert,
   TouchableOpacity,
-ImageBackground,
+  Platform,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Card, Chip } from 'react-native-paper';
+import { Chip } from 'react-native-paper';
 import { supabase } from '../../../../supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { calculateHoursFromTimes } from '../../../../services/timesheets';
+import ConstitutionalScreen, { PanelPurple } from '../../../../components/ConstitutionalScreen';
 
 type TimesheetDetails = {
   id: string;
@@ -258,57 +258,38 @@ export default function TimesheetInvoiceDetails() {
     return `INV-${dateStr}-${idStr}`;
   };
 
+  const handleBack = () => {
+    if (from && typeof from === 'string') {
+      router.replace(from as any);
+    } else {
+      router.replace('/employer/my-shifts');
+    }
+  };
+
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#8B5CF6" />
-        <Text style={styles.loadingText}>Loading invoice…</Text>
-      </View>
+      <ConstitutionalScreen title="Invoice" showBack onBack={handleBack} showLogo theme="light">
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#8B5CF6" />
+          <Text style={styles.loadingText}>Loading invoice…</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   if (!shift || !paymentData) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.emptyText}>Invoice data not found</Text>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/employer/my-shifts');
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-      </View>
+      <ConstitutionalScreen title="Invoice" showBack onBack={handleBack} showLogo theme="light">
+        <View style={styles.center}>
+          <Text style={styles.emptyText}>Invoice data not found</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/employer/my-shifts');
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Invoice</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Invoice" showBack onBack={handleBack} showLogo theme="light">
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Invoice Header */}
         <View style={styles.invoiceHeader}>
           <View>
             <Text style={styles.invoiceTitle}>Invoice</Text>
@@ -324,10 +305,8 @@ export default function TimesheetInvoiceDetails() {
           </View>
         </View>
 
-        {/* Employer Info */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="FROM" titleStyle={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280' }} />
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitle}>FROM</Text>
             <Text style={styles.companyName}>
               {employer?.company_name || 'Employer'}
             </Text>
@@ -359,14 +338,11 @@ export default function TimesheetInvoiceDetails() {
                   Bank: ****{worker.bank_account_number.slice(-4)}
                 </Text>
               )}
-            </Card.Content>
-          </Card>
+          </PanelPurple>
         )}
 
-        {/* Shift Details */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Shift Details" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitleBold}>Shift Details</Text>
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Job Title:</Text>
             <Text style={styles.detailValue}>
@@ -395,14 +371,11 @@ export default function TimesheetInvoiceDetails() {
               </Text>
             </View>
           )}
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
-        {/* Time Breakdown */}
         {timesheet && paymentData && (
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="TIME BREAKDOWN" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content>
+          <PanelPurple style={{ marginBottom: 12 }}>
+            <Text style={styles.cardTitleBold}>TIME BREAKDOWN</Text>
             {timesheet.clock_in_time && (
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Clock in:</Text>
@@ -452,15 +425,11 @@ export default function TimesheetInvoiceDetails() {
                 </Text>
               </View>
             )}
-            </Card.Content>
-          </Card>
+          </PanelPurple>
         )}
 
-        {/* Payment Breakdown */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="PAYMENT BREAKDOWN" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitleBold}>PAYMENT BREAKDOWN</Text>
           <View style={styles.breakdownRow}>
             <Text style={styles.breakdownLabel}>
               Regular Pay:
@@ -515,12 +484,9 @@ export default function TimesheetInvoiceDetails() {
               {formatCurrency(paymentData.workerPayout)}
             </Text>
           </View>
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
-        {/* Payment Status */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
             <View style={styles.statusRow}>
               <Text style={styles.statusLabel}>Payment Status:</Text>
               <Chip
@@ -544,12 +510,11 @@ export default function TimesheetInvoiceDetails() {
             <Text style={styles.thankYouText}>
               Thank you for using FlexiWork! 🚀
             </Text>
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
         <View style={{ height: 32 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 
@@ -652,6 +617,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#111827',
   },
+  cardTitle: { fontSize: 14, fontWeight: 'bold', color: '#6B7280', marginBottom: 8 },
+  cardTitleBold: { fontSize: 16, fontWeight: 'bold', color: '#111827', marginBottom: 8 },
   card: {
     backgroundColor: 'rgba(255,255,255,0.95)',
     borderRadius: 12,

@@ -7,11 +7,10 @@ import {
   TouchableOpacity,
   Alert,
   TextInput,
-ImageBackground, Image,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { PanelPurple } from '../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -55,25 +54,12 @@ export default function PaymentMethodsScreen() {
   };
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Payment Methods</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Payment Methods" showBack onBack={() => router.back()} showLogo theme="light">
       <ScrollView
         style={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* Card Form */}
-        <View style={styles.formCard}>
+        <PanelPurple style={styles.formCard}>
           <Text style={styles.formTitle}>Card Details</Text>
           <Text style={styles.formSubtitle}>
             Enter your payment card information (mock form)
@@ -138,7 +124,7 @@ export default function PaymentMethodsScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

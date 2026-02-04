@@ -7,14 +7,13 @@ import {
   ActivityIndicator,
   Alert,
   ScrollView,
-ImageBackground, Image,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Card, Button } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { createNotification } from '../../../services/notifications';
 import { supabase } from '../../../supabase';
+import ConstitutionalScreen, { PanelPurple } from '../../../components/ConstitutionalScreen';
 
 type Timesheet = {
   id: string;
@@ -418,32 +417,32 @@ export default function EmployerTimesheetDetails() {
     });
   };
 
+  const handleBack = () => {
+    if (from && typeof from === 'string') {
+      router.replace(from as any);
+    } else {
+      router.replace('/employer/my-shifts');
+    }
+  };
+
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#8B5CF6" />
-        <Text style={styles.loadingText}>Loading timesheet…</Text>
-      </View>
+      <ConstitutionalScreen title="Timesheet" showBack onBack={handleBack} showLogo theme="light">
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#8B5CF6" />
+          <Text style={styles.loadingText}>Loading timesheet…</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   if (!timesheet) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.emptyText}>No timesheet found.</Text>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/employer/my-shifts');
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-      </View>
+      <ConstitutionalScreen title="Timesheet" showBack onBack={handleBack} showLogo theme="light">
+        <View style={styles.center}>
+          <Text style={styles.emptyText}>No timesheet found.</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
@@ -460,33 +459,13 @@ export default function EmployerTimesheetDetails() {
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/employer/my-shifts');
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Timesheet</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Timesheet" showBack onBack={handleBack} showLogo theme="light">
       <ScrollView
         style={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* Worker + shift summary */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Worker" titleStyle={{ fontSize: 14, fontWeight: '600', color: '#6B7280' }} />
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitle}>Worker</Text>
             <Text style={styles.workerName}>{workerName}</Text>
 
             {shift && (
@@ -518,14 +497,10 @@ export default function EmployerTimesheetDetails() {
                 </View>
               </>
             )}
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
-        {/* Clock-in / out */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Clock-in / Clock-out" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitleBold}>Clock-in / Clock-out</Text>
           <View style={styles.row}>
             <Ionicons name="log-in-outline" size={16} color="#6B7280" />
             <Text style={styles.rowLabel}>Clock in:</Text>
@@ -594,14 +569,10 @@ export default function EmployerTimesheetDetails() {
                 </TouchableOpacity>
               </View>
             )}
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
-        {/* Hours + status */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Hours summary" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitleBold}>Hours summary</Text>
           <View style={styles.row}>
             <Ionicons name="time-outline" size={16} color="#6B7280" />
             <Text style={styles.rowLabel}>Total hours:</Text>
@@ -709,7 +680,7 @@ export default function EmployerTimesheetDetails() {
 
         <View style={{ height: 24 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 
@@ -796,6 +767,8 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginBottom: 4,
   },
+  cardTitle: { fontSize: 14, fontWeight: '600', color: '#6B7280', marginBottom: 8 },
+  cardTitleBold: { fontSize: 16, fontWeight: 'bold', color: '#111827', marginBottom: 8 },
   workerName: {
     fontSize: 18,
     fontWeight: 'bold',

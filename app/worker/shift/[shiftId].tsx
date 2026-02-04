@@ -12,8 +12,9 @@
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
   import { useLocalSearchParams, useRouter, usePathname } from 'expo-router';
-import { Button, Card } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { supabase } from '../../../supabase';
+import ConstitutionalScreen, { CardWhite, PanelPurple, PanelBlue } from '../../../components/ConstitutionalScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { DateTimePicker } from '../../../components/ui/DateTimePicker';
 import { calculateHoursFromTimes } from '../../../services/timesheets';
@@ -835,26 +836,14 @@ export default function WorkerShiftDetails() {
     }
 
     return (
-      <View style={styles.screen}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerBackButton}
-            onPress={handleBack}
-          >
-            <Ionicons name="arrow-back" size={22} color="#111827" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Shift details</Text>
-          <View style={{ width: 40 }} />
-        </View>
-
+      <ConstitutionalScreen title="Shift details" showBack onBack={handleBack} showLogo theme="light">
         <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
           <Text style={styles.title}>
             {shift.job_title || shift.title || 'Shift'}
           </Text>
 
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Content>
+          <PanelPurple style={{ marginBottom: 12 }}>
+            <View>
               <View style={styles.row}>
                 <Ionicons name="briefcase-outline" size={16} color="#6B7280" />
                 <Text style={styles.rowLabel}>Industry:</Text>
@@ -876,39 +865,33 @@ export default function WorkerShiftDetails() {
                   {formatTime(shift.start_time)} – {formatTime(shift.end_time)}
                 </Text>
               </View>
-            </Card.Content>
-          </Card>
+            </View>
+          </PanelPurple>
 
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="Location" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content>
-              <Text style={styles.descriptionText}>
-                {shift.location || shift.location_address}
-              </Text>
-            </Card.Content>
-          </Card>
+          <PanelBlue style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Location</Text>
+            <Text style={styles.descriptionText}>
+              {shift.location || shift.location_address}
+            </Text>
+          </PanelBlue>
 
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="Description" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content>
-              <Text style={styles.descriptionText}>{shift.description}</Text>
-            </Card.Content>
-          </Card>
+          <PanelPurple style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Description</Text>
+            <Text style={styles.descriptionText}>{shift.description}</Text>
+          </PanelPurple>
 
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="Rate" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content>
-              <Text style={styles.rateText}>
-                SGD${(shift.hourly_rate || 0).toFixed(2)}/hour (×{shift.overtime_multiplier} OT)
-              </Text>
-            </Card.Content>
-          </Card>
+          <PanelBlue style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Rate</Text>
+            <Text style={styles.rateText}>
+              SGD${(shift.hourly_rate || 0).toFixed(2)}/hour (×{shift.overtime_multiplier} OT)
+            </Text>
+          </PanelBlue>
 
           {/* Timesheet section for accepted workers */}
           {application && application.status === 'accepted' && (
-            <Card mode="elevated" style={{ marginBottom: 12 }}>
-              <Card.Title title="Your timesheet" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-              <Card.Content>
+            <PanelPurple style={{ marginBottom: 12 }}>
+              <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Your timesheet</Text>
+              <View>
 
               {/* Case 1: not clocked in yet */}
               {!timesheet || !timesheet.clock_in_time ? (
@@ -1060,14 +1043,14 @@ export default function WorkerShiftDetails() {
                   </View>
                 </>
               )}
-              </Card.Content>
-            </Card>
+              </View>
+            </PanelPurple>
           )}
 
           {/* Completed shift - View Earnings & Review */}
           {shift.status === 'completed' && (
-            <Card mode="elevated" style={{ marginBottom: 12 }}>
-              <Card.Content>
+            <PanelBlue style={{ marginBottom: 12 }}>
+              <View>
                 <View style={styles.completedNotice}>
                   <Ionicons name="checkmark-circle" size={24} color="#3B82F6" />
                   <View style={{ flex: 1, marginLeft: 12 }}>
@@ -1132,8 +1115,8 @@ export default function WorkerShiftDetails() {
                   </Button>
                 )}
               </View>
-              </Card.Content>
-            </Card>
+              </View>
+            </PanelBlue>
           )}
 
           {/* APPLICATION STATUS / APPLY BUTTON */}
@@ -1152,8 +1135,8 @@ export default function WorkerShiftDetails() {
             </Button>
           ) : shift.status === 'open' && alreadyApplied && application ? (
             // Worker has applied - show application status
-            <Card mode="elevated" style={{ marginVertical: 16 }}>
-              <Card.Content>
+            <CardWhite style={{ marginVertical: 16 }}>
+              <View>
                 {application.status === 'pending' ? (
                   <>
                     <View style={styles.appliedBox}>
@@ -1218,8 +1201,8 @@ export default function WorkerShiftDetails() {
                     <Text style={styles.appliedText}>You already applied</Text>
                   </View>
                 )}
-              </Card.Content>
-            </Card>
+              </View>
+            </CardWhite>
           ) : shift.status !== 'open' && shift.status !== 'completed' ? (
             <View style={styles.appliedBox}>
               <Ionicons name="information-circle" size={22} color="#6B7280" />
@@ -1437,7 +1420,7 @@ export default function WorkerShiftDetails() {
 
           <View style={{ height: 40 }} />
         </ScrollView>
-      </View>
+      </ConstitutionalScreen>
     );
   }
 

@@ -15,6 +15,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button, TextInput } from 'react-native-paper';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen from '../../components/ConstitutionalScreen';
 import { DateTimePicker } from '../../components/ui/DateTimePicker';
 
 
@@ -292,31 +293,16 @@ export default function EditShift() {
     );
   }
 
-  return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Button
-          mode="text"
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else if (shiftId) {
-              const shiftIdStr = Array.isArray(shiftId) ? shiftId[0] : shiftId;
-              router.replace(`/employer/shift/${shiftIdStr}`);
-            } else {
-              router.replace('/employer/my-shifts');
-            }
-          }}
-          icon="arrow-back"
-          style={{ marginLeft: -8 }}
-        >
-          Back
-        </Button>
-        <Text style={styles.headerTitle}>Edit Shift</Text>
-        <View style={{ width: 40 }} />
-      </View>
+  const onBack = () => {
+    if (from && typeof from === 'string') router.replace(from as any);
+    else if (shiftId) {
+      const shiftIdStr = Array.isArray(shiftId) ? shiftId[0] : shiftId;
+      router.replace(`/employer/shift/${shiftIdStr}` as any);
+    } else router.replace('/employer/my-shifts');
+  };
 
+  return (
+    <ConstitutionalScreen title="Edit Shift" showBack onBack={onBack} showLogo theme="light">
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Job title */}
         <TextInput
@@ -619,7 +605,7 @@ export default function EditShift() {
           Save changes
         </Button>
       </View>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

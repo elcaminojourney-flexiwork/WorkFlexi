@@ -7,15 +7,14 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
-ImageBackground,
+  Platform,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Card } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../../supabase';
 import { finalizePaymentForTimesheet } from '../../../../services/payments';
 import { calculateHoursFromTimes } from '../../../../services/timesheets';
+import ConstitutionalScreen, { PanelPurple } from '../../../../components/ConstitutionalScreen';
 
 // Mock mode flag - matches services/payments.ts
 const PAYMENTS_ENABLED = false;
@@ -297,32 +296,32 @@ export default function PaymentSummary() {
     });
   };
 
+  const handleBack = () => {
+    if (from && typeof from === 'string') {
+      router.replace(from as any);
+    } else {
+      router.replace('/employer/my-shifts');
+    }
+  };
+
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#8B5CF6" />
-        <Text style={styles.loadingText}>Loading payment summary…</Text>
-      </View>
+      <ConstitutionalScreen title="Payment Summary" showBack onBack={handleBack} showLogo theme="light">
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#8B5CF6" />
+          <Text style={styles.loadingText}>Loading payment summary…</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   if (!timesheet || !shift) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.emptyText}>Unable to load payment details.</Text>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/employer/my-shifts');
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-      </View>
+      <ConstitutionalScreen title="Payment Summary" showBack onBack={handleBack} showLogo theme="light">
+        <View style={styles.center}>
+          <Text style={styles.emptyText}>Unable to load payment details.</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
@@ -359,34 +358,13 @@ export default function PaymentSummary() {
     escrowPayment?.status === 'mock_released';
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/employer/my-shifts');
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Payment Summary</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Payment Summary" showBack onBack={handleBack} showLogo theme="light">
       <ScrollView
         style={styles.container}
         showsVerticalScrollIndicator={false}
       >
-        {/* Card 1: Work Hours */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Work Hours" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitleBold}>Work Hours</Text>
           <View style={styles.row}>
             <Ionicons name="log-in-outline" size={16} color="#6B7280" />
             <Text style={styles.rowLabel}>Clock in:</Text>
@@ -440,14 +418,10 @@ export default function PaymentSummary() {
               {hoursCalculation.overtimeHours.toFixed(2)} hours
             </Text>
           </View>
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
-        {/* Card 2: Amounts */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Amounts" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitleBold}>Amounts</Text>
           <View style={styles.row}>
             <Text style={styles.rowLabel}>Regular:</Text>
             <Text style={styles.rowValue}>
@@ -477,14 +451,10 @@ export default function PaymentSummary() {
             <Text style={styles.totalLabel}>Subtotal:</Text>
             <Text style={styles.totalValue}>SGD${subtotal.toFixed(2)}</Text>
           </View>
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
-        {/* Card 3: Platform Fee */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Platform Fee" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitleBold}>Platform Fee</Text>
           <View style={styles.row}>
             <Text style={styles.rowLabel}>Platform fee ({platformFeePercentage * 100}%):</Text>
             <Text style={styles.rowValueBold}>
@@ -495,14 +465,10 @@ export default function PaymentSummary() {
             <Text style={styles.hintText}>
               Covers platform operation, worker support, and shift matching.
             </Text>
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
-        {/* Card 4: Escrow & Final */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Escrow & Final" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitleBold}>Escrow & Final</Text>
           {escrowPayment ? (
             <>
               <View style={styles.row}>
@@ -584,7 +550,7 @@ export default function PaymentSummary() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 
@@ -622,6 +588,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  cardTitleBold: { fontSize: 16, fontWeight: 'bold', color: '#111827', marginBottom: 8 },
   center: {
     flex: 1,
     justifyContent: 'center',

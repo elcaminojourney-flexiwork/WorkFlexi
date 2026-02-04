@@ -11,8 +11,9 @@ ImageBackground, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Card, Switch, List } from 'react-native-paper';
+import { Switch, List } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../../components/ConstitutionalScreen';
 import { supabase } from '../../../supabase';
 
 type NotificationPreferences = {
@@ -152,28 +153,14 @@ export default function EmployerNotificationSettingsScreen() {
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => router.replace('/employer/settings')}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Notification Settings</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Notification Settings" showBack onBack={() => router.replace('/employer/settings')} showLogo theme="light">
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Email Notifications Section */}
-        <Card mode="elevated" style={styles.section}>
-          <Card.Title
-            title="Email Notifications"
-            titleStyle={styles.sectionTitle}
-            left={(props) => <Ionicons name="mail-outline" size={24} color="#6D28D9" />}
-          />
-          <Card.Content>
+        <PanelPurple style={styles.section}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <Ionicons name="mail-outline" size={24} color="#6D28D9" />
+            <Text style={styles.sectionTitle}>Email Notifications</Text>
+          </View>
+          <View>
             <List.Item
               title="New Applications"
               description="Get notified when workers apply to your shifts"
@@ -295,12 +282,12 @@ export default function EmployerNotificationSettingsScreen() {
                 />
               )}
             />
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelBlue>
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

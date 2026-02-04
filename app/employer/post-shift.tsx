@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Platform, ImageBackground, Image, TextInput as RNTextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Platform, TextInput as RNTextInput } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { DateTimePicker } from '../../components/ui/DateTimePicker';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../components/ConstitutionalScreen';
 
 const COLORS = {
   purple100: '#F3E8FF', purple200: '#E9D5FF', purple300: '#D8B4FE', purple400: '#C084FC',
@@ -98,23 +99,7 @@ export default function PostShift() {
   };
 
   return (
-    <ImageBackground source={require('../../assets/images/background.webp')} style={styles.container} resizeMode="cover">
-      <LinearGradient colors={['rgba(139, 92, 246, 0.95)', 'rgba(59, 130, 246, 0.92)', 'rgba(147, 51, 234, 0.90)']} style={StyleSheet.absoluteFillObject} />
-      
-      <View style={styles.logoBox}>
-        <Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" />
-      </View>
-
-      {/* PURPLE/BLUE HEADER */}
-      <LinearGradient colors={[COLORS.purple700, COLORS.blue600]} style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Post New Shift</Text>
-        <View style={{ width: 44 }} />
-      </LinearGradient>
-
-      {/* PROGRESS BAR - COLORED */}
+    <ConstitutionalScreen title="Post New Shift" showBack onBack={handleBack} showLogo theme="light" scrollable={false}>
       <LinearGradient colors={[COLORS.purple600, COLORS.blue500]} style={styles.progressBar}>
         {[1, 2, 3, 4].map((step) => (
           <View key={step} style={styles.progressStep}>
@@ -127,10 +112,8 @@ export default function PostShift() {
       </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        
-        {/* STEP 1 - PURPLE CARD */}
         {currentStep === 1 && (
-          <LinearGradient colors={[COLORS.purple300, COLORS.blue200]} style={styles.card}>
+          <PanelPurple style={styles.card}>
             <LinearGradient colors={[COLORS.purple600, COLORS.blue600]} style={styles.cardHeader}>
               <Ionicons name="briefcase" size={24} color={COLORS.white} />
               <Text style={styles.cardTitle}>Shift Details</Text>
@@ -172,12 +155,11 @@ export default function PostShift() {
                 </TouchableOpacity>
               ))}
             </View>
-          </LinearGradient>
+          </PanelPurple>
         )}
 
-        {/* STEP 2 - BLUE CARD */}
         {currentStep === 2 && (
-          <LinearGradient colors={[COLORS.blue300, COLORS.purple200]} style={styles.card}>
+          <PanelBlue style={styles.card}>
             <LinearGradient colors={[COLORS.blue600, COLORS.purple600]} style={styles.cardHeader}>
               <Ionicons name="calendar" size={24} color={COLORS.white} />
               <Text style={styles.cardTitle}>Date, Time & Location</Text>
@@ -236,12 +218,11 @@ export default function PostShift() {
                 ))}
               </View>
             </View>
-          </LinearGradient>
+          </PanelBlue>
         )}
 
-        {/* STEP 3 - PURPLE CARD */}
         {currentStep === 3 && (
-          <LinearGradient colors={[COLORS.purple300, COLORS.blue300]} style={styles.card}>
+          <PanelPurple style={styles.card}>
             <LinearGradient colors={[COLORS.purple600, COLORS.blue600]} style={styles.cardHeader}>
               <Ionicons name="cash" size={24} color={COLORS.white} />
               <Text style={styles.cardTitle}>Payment Details</Text>
@@ -268,12 +249,11 @@ export default function PostShift() {
                 </LinearGradient>
               )}
             </View>
-          </LinearGradient>
+          </PanelPurple>
         )}
 
-        {/* STEP 4 - SUMMARY */}
         {currentStep === 4 && (
-          <LinearGradient colors={[COLORS.blue300, COLORS.purple300]} style={styles.card}>
+          <PanelBlue style={styles.card}>
             <LinearGradient colors={[COLORS.blue600, COLORS.purple600]} style={styles.cardHeader}>
               <Ionicons name="checkmark-circle" size={24} color={COLORS.white} />
               <Text style={styles.cardTitle}>Confirm & Publish</Text>
@@ -294,13 +274,12 @@ export default function PostShift() {
                 <Text style={styles.totalBoxValue}>SGD ${calculateShiftDetails().totalAmount.toFixed(2)}</Text>
               </LinearGradient>
             </View>
-          </LinearGradient>
+          </PanelBlue>
         )}
 
         <View style={{ height: 140 }} />
       </ScrollView>
 
-      {/* FOOTER BUTTON - COLORED */}
       <View style={styles.footer}>
         <TouchableOpacity onPress={currentStep < 4 ? handleNext : handlePublish} disabled={loading} style={styles.footerBtn}>
           <LinearGradient colors={[COLORS.purple600, COLORS.blue600]} style={styles.footerBtnGradient}>
@@ -317,26 +296,20 @@ export default function PostShift() {
       <DateTimePicker visible={showDatePicker} mode="date" value={shiftDate} onConfirm={(d) => { setShiftDate(d); setShowDatePicker(false); }} onCancel={() => setShowDatePicker(false)} />
       <DateTimePicker visible={showStartTimePicker} mode="time" value={startTime} onConfirm={(d) => { setStartTime(d); setShowStartTimePicker(false); }} onCancel={() => setShowStartTimePicker(false)} />
       <DateTimePicker visible={showEndTimePicker} mode="time" value={endTime} onConfirm={(d) => { setEndTime(d); setShowEndTimePicker(false); }} onCancel={() => setShowEndTimePicker(false)} />
-    </ImageBackground>
+    </ConstitutionalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8 },
-  logo: { width: 32, height: 32 },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: Platform.OS === 'web' ? 70 : 100, paddingBottom: 16, paddingHorizontal: 20 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  headerTitle: { fontSize: 22, fontWeight: '700', color: '#FFFFFF' },
   progressBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 16 },
   progressStep: { flexDirection: 'row', alignItems: 'center' },
   progressDot: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center' },
   progressNum: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
   progressLine: { width: 36, height: 4, backgroundColor: 'rgba(255,255,255,0.3)', marginHorizontal: 4 },
   progressLineActive: { backgroundColor: '#FFFFFF' },
-  content: { flex: 1, paddingHorizontal: 16 },
-  card: { borderRadius: 24, marginBottom: 16, overflow: 'hidden' },
-  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 20 },
+  content: { flex: 1 },
+  card: { borderRadius: 24, marginBottom: 16, overflow: 'hidden', padding: 0 },
+  cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 20, marginHorizontal: -20, marginTop: -20 },
   cardTitle: { fontSize: 20, fontWeight: '700', color: '#FFFFFF' },
   cardBody: { padding: 20 },
   label: { fontSize: 14, fontWeight: '700', color: COLORS.purple800, marginBottom: 8, marginTop: 16 },

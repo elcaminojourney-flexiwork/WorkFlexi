@@ -13,9 +13,10 @@ ImageBackground,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Button, Card } from 'react-native-paper';
+import { Button } from 'react-native-paper';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../components/ConstitutionalScreen';
 import ReviewCard from '../../components/ReviewCard';
 import { NotificationList } from '../../components/ui/NotificationList';
 
@@ -209,39 +210,23 @@ export default function EmployerProfileScreen() {
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Button
-          mode="text"
-          onPress={() => router.replace('/employer')}
-          icon="arrow-back"
-          style={{ marginLeft: -8 }}
-        >
-          Back
-        </Button>
-        <Text style={styles.headerTitle}>Employer profile</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Employer profile" showBack onBack={() => router.replace('/employer')} showLogo theme="light">
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Logo */}
         {profile.profile_photo_url && (
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="Logo" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content style={{ alignItems: 'center', paddingVertical: 16 }}>
-              <Image
-                source={{ uri: profile.profile_photo_url }}
-                style={styles.profilePhoto}
-              />
-            </Card.Content>
-          </Card>
+          <PanelBlue style={{ marginBottom: 12, alignItems: 'center', paddingVertical: 16 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Logo</Text>
+            <Image
+              source={{ uri: profile.profile_photo_url }}
+              style={styles.profilePhoto}
+            />
+          </PanelBlue>
         )}
 
         {/* Company card */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Company" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Company</Text>
+          <View>
             <View style={styles.row}>
               <Text style={styles.label}>Company name</Text>
               <Text style={styles.value}>
@@ -267,14 +252,13 @@ export default function EmployerProfileScreen() {
               <Text style={styles.label}>Industry</Text>
               <Text style={styles.value}>{profile.industry || 'Not set'}</Text>
             </View>
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelPurple>
 
         {/* Contact card */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Contact details" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Contact details</Text>
+          <View>
           <View style={styles.row}>
             <Text style={styles.label}>Contact person</Text>
             <Text style={styles.value}>
@@ -353,16 +337,13 @@ export default function EmployerProfileScreen() {
                   : 'No reviews yet'}
               </Text>
             </View>
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelPurple>
 
         {/* Reviews */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title 
-            title={`Reviews (${profile.total_reviews || 0})`} 
-            titleStyle={{ fontSize: 16, fontWeight: 'bold' }} 
-          />
-          <Card.Content>
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Reviews ({profile.total_reviews || 0})</Text>
+          <View>
           {reviews.length === 0 && !reviewsLoading ? (
             <Text style={styles.emptySubText}>No reviews yet</Text>
           ) : (
@@ -448,7 +429,7 @@ export default function EmployerProfileScreen() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

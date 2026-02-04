@@ -8,13 +8,13 @@ import {
   TextInput,
   TouchableOpacity,
   Alert,
-ImageBackground,
+  Platform,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Card, Chip } from 'react-native-paper';
+import { Chip } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../../supabase';
+import ConstitutionalScreen, { PanelPurple } from '../../../../components/ConstitutionalScreen';
 
 type Dispute = {
   id: string;
@@ -39,7 +39,7 @@ const COLORS = {
 };
 
 export default function DisputeDetails() {
-  const { disputeId } = useLocalSearchParams();
+  const { disputeId, from } = useLocalSearchParams<{ disputeId?: string; from?: string }>();
   const router = useRouter();
 
   const [dispute, setDispute] = useState<Dispute | null>(null);
@@ -214,75 +214,39 @@ export default function DisputeDetails() {
     return 'Open';
   };
 
+  const handleBack = () => {
+    if (from && typeof from === 'string') {
+      router.replace(from as any);
+    } else {
+      router.back();
+    }
+  };
+
   if (loading) {
     return (
-      <View style={styles.screen}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/employer/my-shifts');
-            }
-          }}
-          >
-            <Ionicons name="arrow-back" size={22} color="#111827" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Dispute details</Text>
-          <View style={{ width: 40 }} />
-        </View>
+      <ConstitutionalScreen title="Dispute details" showBack onBack={handleBack} showLogo theme="light">
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" />
         </View>
-      </View>
+      </ConstitutionalScreen>
     );
   }
 
   if (!dispute) {
     return (
-      <View style={styles.screen}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/employer/my-shifts');
-            }
-          }}
-          >
-            <Ionicons name="arrow-back" size={22} color="#111827" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Dispute details</Text>
-          <View style={{ width: 40 }} />
-        </View>
+      <ConstitutionalScreen title="Dispute details" showBack onBack={handleBack} showLogo theme="light">
         <View style={styles.centerContent}>
           <Text style={{ color: '#111827' }}>Dispute not found.</Text>
         </View>
-      </View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <View style={styles.screen}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Dispute details</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Dispute details" showBack onBack={handleBack} showLogo theme="light">
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Dispute info" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitleBold}>Dispute info</Text>
             <Text style={styles.rowLabel}>Type</Text>
             <Text style={styles.rowValue}>{prettyType(dispute.dispute_type)}</Text>
 
@@ -319,12 +283,10 @@ export default function DisputeDetails() {
                 </Text>
               </>
             )}
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Resolution notes" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={styles.cardTitleBold}>Resolution notes</Text>
             <Text style={styles.subText}>
               Add or update your internal notes about how this dispute was handled.
             </Text>
@@ -336,8 +298,7 @@ export default function DisputeDetails() {
               multiline
               numberOfLines={4}
             />
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
         <TouchableOpacity
           style={[
@@ -374,7 +335,7 @@ export default function DisputeDetails() {
 
         <View style={{ height: 24 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 
@@ -412,6 +373,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
+  cardTitleBold: { fontSize: 16, fontWeight: 'bold', color: '#111827', marginBottom: 8 },
   centerContent: {
     flex: 1,
     alignItems: 'center',

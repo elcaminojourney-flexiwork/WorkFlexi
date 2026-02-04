@@ -29,7 +29,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <ConstitutionalScreen title="Settings" showBack onBack={() => router.back()} showLogo showFooter>
+    <ConstitutionalScreen title="Settings" showBack onBack={() => router.back()} showLogo showFooter theme="light">
       <PanelPurple style={styles.menuCard}>
         {menuItems.map((item, i) => (
           <TouchableOpacity key={i} onPress={() => item.route && router.push(item.route as any)} style={[styles.menuItem, i < menuItems.length - 1 && styles.menuItemBorder]}>

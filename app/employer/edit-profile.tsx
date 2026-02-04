@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import { TextInput, Button } from 'react-native-paper';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen from '../../components/ConstitutionalScreen';
 import { uploadProfilePhoto, pickImage } from '../../services/file-upload';
 
 type EmployerProfile = {
@@ -226,19 +227,7 @@ export default function EditEmployerProfileScreen() {
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => router.replace('/employer/profile')}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Edit profile</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Edit profile" showBack onBack={() => router.replace('/employer/profile')} showLogo theme="light">
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Company section */}
         <Text style={styles.sectionTitle}>Company details</Text>
@@ -393,7 +382,7 @@ export default function EditEmployerProfileScreen() {
           )}
         </TouchableOpacity>
       </View>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

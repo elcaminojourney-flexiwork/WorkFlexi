@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ScrollView, ImageBackground,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Button, TextInput } from 'react-native-paper';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen from '../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -170,7 +170,7 @@ export default function EmployeeOnboardingPage() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ConstitutionalScreen title="Employee Onboarding" showBack onBack={() => router.replace('/auth/select-user-type')} showLogo theme="light">
       <View style={styles.content}>
         <View style={styles.header}>
           <Ionicons name="person-add" size={48} color="#3B82F6" style={styles.icon} />
@@ -283,7 +283,6 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
-    paddingTop: 60,
   },
   header: {
     alignItems: 'center',

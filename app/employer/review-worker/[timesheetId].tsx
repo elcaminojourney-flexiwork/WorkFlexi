@@ -7,15 +7,15 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-ImageBackground, Image,
+  Platform,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Button, TextInput } from 'react-native-paper';
 import { supabase } from '../../../supabase';
 import { Ionicons } from '@expo/vector-icons';
 import StarRating from '../../../components/StarRating';
 import { createReview, checkReviewExists } from '../../../services/reviews';
+import ConstitutionalScreen, { PanelPurple } from '../../../components/ConstitutionalScreen';
 
 type Timesheet = {
   id: string;
@@ -262,31 +262,28 @@ export default function ReviewWorker() {
     });
   };
 
+  const handleBack = () => {
+    if (from && typeof from === 'string') {
+      router.replace(from as any);
+    } else {
+      router.back();
+    }
+  };
+
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#8B5CF6" />
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
+      <ConstitutionalScreen title="Review Worker" showBack onBack={handleBack} showLogo theme="light">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#8B5CF6" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   if (alreadyReviewed) {
     return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          if (from && typeof from === 'string') {
-            router.replace(from as any);
-          } else {
-            router.replace('/employer/my-shifts');
-          }
-        }}>
-            <Ionicons name="arrow-back" size={24} color="#111827" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Review Worker</Text>
-          <View style={{ width: 24 }} />
-        </View>
+      <ConstitutionalScreen title="Review Worker" showBack onBack={handleBack} showLogo theme="light">
         <View style={styles.centerContent}>
           <Ionicons name="checkmark-circle" size={64} color="#3B82F6" />
           <Text style={styles.alreadyReviewedTitle}>Already Reviewed</Text>
@@ -294,7 +291,7 @@ export default function ReviewWorker() {
             You have already submitted a review for this shift.
           </Text>
         </View>
-      </View>
+      </ConstitutionalScreen>
     );
   }
 
@@ -305,20 +302,7 @@ export default function ReviewWorker() {
     if (!worker) missingData.push('worker profile');
     
     return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-        <TouchableOpacity onPress={() => {
-          if (from && typeof from === 'string') {
-            router.replace(from as any);
-          } else {
-            router.replace('/employer/my-shifts');
-          }
-        }}>
-            <Ionicons name="arrow-back" size={24} color="#111827" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Review Worker</Text>
-          <View style={{ width: 24 }} />
-        </View>
+      <ConstitutionalScreen title="Review Worker" showBack onBack={handleBack} showLogo theme="light">
         <View style={styles.centerContent}>
           <Ionicons name="alert-circle-outline" size={48} color="#7C3AED" />
           <Text style={styles.errorText}>Unable to load review data</Text>
@@ -329,29 +313,19 @@ export default function ReviewWorker() {
             Please check console for details.
           </Text>
         </View>
-      </View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Rate Worker</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
+    <ConstitutionalScreen title="Rate Worker" showBack onBack={handleBack} showLogo theme="light">
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Worker Info */}
-        <View style={styles.infoCard}>
+        <PanelPurple style={styles.infoCard}>
           <Text style={styles.workerName}>{worker.full_name || 'Worker'}</Text>
           <Text style={styles.shiftInfo}>
             {shift.job_title || 'Shift'} • {formatDate(shift.shift_date)}
           </Text>
-        </View>
+        </PanelPurple>
 
         {/* Overall Performance (Required) */}
         <View style={styles.section}>
@@ -483,7 +457,7 @@ export default function ReviewWorker() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

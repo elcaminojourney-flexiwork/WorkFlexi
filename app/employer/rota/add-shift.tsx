@@ -9,15 +9,13 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
-  ImageBackground,
-  Image,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../supabase';
-import { palette, colors, gradients, typography, spacing, borderRadius, shadows } from '../../../constants/theme';
-import { createRotaShift, createRotaShiftsBatch } from '../../../services/rota';
+import { palette, colors, typography, spacing, borderRadius } from '../../../constants/theme';
+import { createRotaShift } from '../../../services/rota';
+import ConstitutionalScreen, { PanelPurple } from '../../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -161,37 +159,18 @@ export default function AddShift() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={palette.purple[500]} />
-      </View>
+      <ConstitutionalScreen title="Add Shift" showBack onBack={() => router.back()} showLogo theme="light">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={palette.purple[500]} />
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <LinearGradient colors={gradients.employer} style={styles.header}>
-        <View style={styles.headerContent}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="close" size={24} color={palette.white} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Add Shift</Text>
-          <TouchableOpacity 
-            onPress={handleSave} 
-            style={[styles.saveButton, saving && styles.saveButtonDisabled]}
-            disabled={saving}
-          >
-            {saving ? (
-              <ActivityIndicator size="small" color={palette.white} />
-            ) : (
-              <Text style={styles.saveButtonText}>Save</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
-
+    <ConstitutionalScreen title="Add Shift" showBack onBack={() => router.back()} showLogo theme="light">
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Date */}
+        <PanelPurple style={styles.formPanel}>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Date</Text>
           <TextInput
@@ -318,29 +297,31 @@ export default function AddShift() {
           />
         </View>
 
+        <TouchableOpacity
+          style={[styles.saveButtonBottom, saving && styles.saveButtonDisabled]}
+          onPress={handleSave}
+          disabled={saving}
+        >
+          {saving ? (
+            <ActivityIndicator size="small" color="#FFFFFF" />
+          ) : (
+            <Text style={styles.saveButtonText}>Save</Text>
+          )}
+        </TouchableOpacity>
+        </PanelPurple>
         <View style={{ height: 100 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
-  logo: { width: 32, height: 32 },
-
-  container: { flex: 1, backgroundColor: colors.background },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
-  
-  header: { paddingTop: 50, paddingBottom: spacing.md, paddingHorizontal: spacing.lg },
-  headerContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  backButton: { padding: spacing.sm },
-  headerTitle: { fontSize: typography.sizes.h3, fontWeight: typography.weights.bold, color: palette.white },
-  saveButton: { backgroundColor: 'rgba(255,255,255,0.2)', paddingVertical: spacing.sm, paddingHorizontal: spacing.lg, borderRadius: borderRadius.md },
+  loadingContainer: { paddingVertical: spacing.xl },
   saveButtonDisabled: { opacity: 0.5 },
-  saveButtonText: { color: palette.white, fontWeight: typography.weights.semibold, fontSize: typography.sizes.body },
-  
-  content: { flex: 1, padding: spacing.lg },
+  saveButtonBottom: { backgroundColor: palette.purple[500], paddingVertical: spacing.lg, borderRadius: borderRadius.xl, alignItems: 'center', marginTop: spacing.lg },
+  saveButtonText: { color: '#FFFFFF', fontWeight: typography.weights.semibold, fontSize: typography.sizes.body },
+  formPanel: { marginBottom: spacing.lg },
+  content: { flex: 1 },
   
   section: { marginBottom: spacing.xl },
   sectionTitle: { fontSize: typography.sizes.body, fontWeight: typography.weights.semibold, color: colors.textPrimary, marginBottom: spacing.sm },

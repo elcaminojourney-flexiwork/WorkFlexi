@@ -10,8 +10,8 @@ ImageBackground, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Card } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -68,13 +68,11 @@ export default function NotificationSettings() {
                 thumbColor="#FFF"
               />
             </View>
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="System notifications" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-            <View style={styles.row}>
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>System notifications</Text>
+          <View style={styles.row}>
               <Text style={styles.label}>System alerts</Text>
               <Switch
                 value={systemAlerts}
@@ -93,12 +91,11 @@ export default function NotificationSettings() {
                 thumbColor="#FFF"
               />
             </View>
-          </Card.Content>
-        </Card>
+        </PanelBlue>
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

@@ -12,10 +12,11 @@ ImageBackground, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Button, Card, Chip } from 'react-native-paper';
+import { Button, Chip } from 'react-native-paper';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
 import { checkReviewExists } from '../../services/reviews';
+import ConstitutionalScreen, { PanelPurple } from '../../components/ConstitutionalScreen';
 
 type Shift = {
   id: string;
@@ -457,21 +458,7 @@ export default function WorkerMyShifts() {
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Button
-          mode="text"
-          onPress={() => router.replace('/worker')}
-          icon="arrow-back"
-          style={{ marginLeft: -8 }}
-        >
-          Back
-        </Button>
-        <Text style={styles.headerTitle}>My Shifts</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="My Shifts" showBack onBack={() => router.replace('/worker')} showLogo theme="light">
       {/* Tabs */}
       <View style={styles.tabsContainer}>
         <ScrollView
@@ -532,26 +519,22 @@ export default function WorkerMyShifts() {
             <TouchableOpacity
               key={shift.id}
               onPress={() => {
-                // Always navigate to shift details - the shift details page will show earning summary for completed shifts
                 router.push(`/worker/shift/${shift.id}?from=/worker/my-shifts`);
               }}
               style={{ marginBottom: 12 }}
             >
-              <Card mode="elevated" style={{ marginBottom: 0 }}>
-                <Card.Title
-                  title={shift.job_title || 'Shift'}
-                  titleStyle={{ fontSize: 16, fontWeight: 'bold' }}
-                  right={() => (
-                    <Chip
-                      mode="flat"
-                      style={{ backgroundColor: getStatusColor(shift.status) }}
-                      textStyle={{ color: '#FFFFFF', fontSize: 12, fontWeight: '600' }}
-                    >
-                      {getStatusText(shift.status)}
-                    </Chip>
-                  )}
-                />
-                <Card.Content>
+              <PanelPurple style={{ marginBottom: 0 }}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>{shift.job_title || 'Shift'}</Text>
+                  <Chip
+                    mode="flat"
+                    style={{ backgroundColor: getStatusColor(shift.status) }}
+                    textStyle={{ color: '#FFFFFF', fontSize: 12, fontWeight: '600' }}
+                  >
+                    {getStatusText(shift.status)}
+                  </Chip>
+                </View>
+                <View>
                   <View style={styles.cardRow}>
                     <Ionicons name="calendar-outline" size={14} color="#6B7280" />
                     <Text style={styles.cardRowText}>
@@ -624,15 +607,15 @@ export default function WorkerMyShifts() {
                       )}
                     </View>
                   )}
-                </Card.Content>
-              </Card>
+                </View>
+              </PanelPurple>
             </TouchableOpacity>
           ))
         )}
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

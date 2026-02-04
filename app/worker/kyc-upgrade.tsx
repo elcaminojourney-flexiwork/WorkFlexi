@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ScrollView, ImageBackground,
-} from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Button, TextInput } from 'react-native-paper';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { CardWhite } from '../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -324,87 +323,57 @@ export default function KYCUpgradePage() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="arrow-back" size={24} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>KYC Verification</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
+    <ConstitutionalScreen title="KYC Verification" showBack onBack={handleBack} showLogo theme="light">
       {renderStepIndicator()}
+      <CardWhite style={styles.stepCard}>
+        <View style={styles.content}>
+          {step === 1 && renderStep1()}
+          {step === 2 && renderStep2()}
+          {step === 3 && renderStep3()}
 
-      <View style={styles.content}>
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
+          <View style={styles.actions}>
+            {step < 3 ? (
+              <Button
+                mode="contained"
+                onPress={handleNext}
+                disabled={loading}
+                style={styles.primaryButton}
+                icon="arrow-forward"
+              >
+                Next
+              </Button>
+            ) : (
+              <Button
+                mode="contained"
+                onPress={handleComplete}
+                loading={loading}
+                disabled={loading}
+                style={styles.primaryButton}
+                icon="check-circle"
+              >
+                Submit for Verification
+              </Button>
+            )}
 
-        <View style={styles.actions}>
-          {step < 3 ? (
-            <Button
-              mode="contained"
-              onPress={handleNext}
-              disabled={loading}
-              style={styles.primaryButton}
-              icon="arrow-forward"
-            >
-              Next
-            </Button>
-          ) : (
-            <Button
-              mode="contained"
-              onPress={handleComplete}
-              loading={loading}
-              disabled={loading}
-              style={styles.primaryButton}
-              icon="check-circle"
-            >
-              Submit for Verification
-            </Button>
-          )}
-
-          {step > 1 && (
-            <Button
-              mode="outlined"
-              onPress={handleBack}
-              disabled={loading}
-              style={styles.secondaryButton}
-            >
-              Back
-            </Button>
-          )}
+            {step > 1 && (
+              <Button
+                mode="outlined"
+                onPress={handleBack}
+                disabled={loading}
+                style={styles.secondaryButton}
+              >
+                Back
+              </Button>
+            )}
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </CardWhite>
+    </ConstitutionalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
-  logo: { width: 32, height: 32 },
-
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
+  stepCard: { marginTop: 8 },
   stepIndicator: {
     flexDirection: 'row',
     justifyContent: 'center',

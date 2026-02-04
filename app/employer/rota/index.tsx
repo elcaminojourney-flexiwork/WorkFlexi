@@ -9,25 +9,15 @@ import {
   RefreshControl,
   Alert,
   Modal,
-  ImageBackground,
-  Image,
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../supabase';
-import { 
-  palette, colors, gradients, typography, spacing, borderRadius, shadows, 
-  calendarColors, roleColors, getStatusColor 
-} from '../../../constants/theme';
-import { 
-  getWeeklyRota, 
-  publishRotaWeek, 
-  copyRotaWeek,
-  createRotaShift,
-  deleteRotaShift,
-} from '../../../services/rota';
+import { palette, colors, gradients, typography, spacing, borderRadius } from '../../../constants/theme';
+import { getWeeklyRota, publishRotaWeek, copyRotaWeek } from '../../../services/rota';
+import ConstitutionalScreen from '../../../components/ConstitutionalScreen';
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const FULL_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -59,6 +49,8 @@ export default function RotaCalendar() {
   useEffect(() => {
     if (venueId) {
       loadData();
+    } else {
+      setLoading(false);
     }
   }, [venueId, weekStart]);
 
@@ -106,7 +98,10 @@ export default function RotaCalendar() {
       }
     } catch (error) {
       console.error('Error loading data:', error);
-      Alert.alert('Error', 'Failed to load rota data');
+      setVenue(null);
+      setShifts([]);
+      setRoles([]);
+      Alert.alert('Error', 'Failed to load rota data. Check that the venue exists and rota is set up.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -196,46 +191,53 @@ export default function RotaCalendar() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={palette.purple[500]} />
-        <Text style={styles.loadingText}>Loading rota...</Text>
-      </View>
+      <ConstitutionalScreen title="Rota" showBack onBack={() => router.back()} showLogo theme="light" scrollable={false}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={palette.purple[500]} />
+          <Text style={styles.loadingText}>Loading rota...</Text>
+        </View>
+      </ConstitutionalScreen>
+    );
+  }
+
+  if (!venueId) {
+    return (
+      <ConstitutionalScreen title="Rota" showBack onBack={() => router.back()} showLogo theme="light">
+        <View style={styles.emptyState}>
+          <View style={styles.emptyIcon}>
+            <Ionicons name="calendar-outline" size={64} color={palette.purple[300]} />
+          </View>
+          <Text style={styles.emptyTitle}>Select a venue</Text>
+          <Text style={styles.emptyText}>
+            Open rota from an organisation or venue to see the weekly schedule.
+          </Text>
+          <TouchableOpacity style={styles.emptyButton} onPress={() => router.replace('/employer/organisation')}>
+            <Ionicons name="business" size={20} color="#FFFFFF" />
+            <Text style={styles.emptyButtonText}>My Organisations</Text>
+          </TouchableOpacity>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <LinearGradient colors={gradients.employer} style={styles.header}>
-        <View style={styles.headerTop}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={palette.white} />
-          </TouchableOpacity>
-          <View style={styles.headerTitleContainer}>
-            <Text style={styles.headerTitle}>{venue?.name || 'Rota'}</Text>
-            <Text style={styles.headerSubtitle}>Weekly Schedule</Text>
-          </View>
-          <TouchableOpacity 
-            onPress={() => router.push(`/employer/rota/settings?venueId=${venueId}`)}
-            style={styles.settingsButton}
-          >
-            <Ionicons name="settings-outline" size={24} color={palette.white} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Week Navigation */}
+    <ConstitutionalScreen title={venue?.name || 'Rota'} showBack onBack={() => router.back()} showLogo theme="light" scrollable={false}>
+      <View style={styles.weekNavWrap}>
+        <TouchableOpacity onPress={() => router.push(`/employer/rota/settings?venueId=${venueId}`)} style={styles.settingsButton}>
+          <Ionicons name="settings-outline" size={22} color={palette.purple[600]} />
+        </TouchableOpacity>
         <View style={styles.weekNav}>
           <TouchableOpacity onPress={() => navigateWeek(-1)} style={styles.weekNavButton}>
-            <Ionicons name="chevron-back" size={24} color={palette.white} />
+            <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setWeekStart(getMonday(new Date()))} style={styles.weekDisplay}>
             <Text style={styles.weekText}>{formatWeekRange()}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigateWeek(1)} style={styles.weekNavButton}>
-            <Ionicons name="chevron-forward" size={24} color={palette.white} />
+            <Ionicons name="chevron-forward" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
-      </LinearGradient>
+      </View>
 
       {/* Action Bar */}
       <View style={styles.actionBar}>
@@ -401,7 +403,7 @@ export default function RotaCalendar() {
           </View>
         </View>
       </Modal>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 
@@ -410,24 +412,24 @@ const styles = StyleSheet.create({
   logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
   logo: { width: 32, height: 32 },
 
-  container: { flex: 1, backgroundColor: colors.background },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
+  loadingContainer: { paddingVertical: spacing.xl },
   loadingText: { marginTop: spacing.md, color: colors.textSecondary, fontSize: typography.sizes.body },
+
+  emptyState: { alignItems: 'center', paddingVertical: spacing.xl3 },
+  emptyIcon: { width: 120, height: 120, borderRadius: 60, backgroundColor: palette.purple[50], justifyContent: 'center', alignItems: 'center', marginBottom: spacing.lg },
+  emptyTitle: { fontSize: typography.sizes.h3, fontWeight: typography.weights.bold, color: colors.textPrimary, marginBottom: spacing.sm },
+  emptyText: { fontSize: typography.sizes.body, color: colors.textSecondary, textAlign: 'center', paddingHorizontal: spacing.xl, marginBottom: spacing.lg },
+  emptyButton: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, backgroundColor: palette.purple[500], paddingVertical: spacing.md, paddingHorizontal: spacing.lg, borderRadius: borderRadius.lg },
+  emptyButtonText: { color: '#FFFFFF', fontWeight: typography.weights.semibold, fontSize: typography.sizes.body },
   
-  header: { paddingTop: 50, paddingBottom: spacing.lg, paddingHorizontal: spacing.lg },
-  headerTop: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md },
-  backButton: { padding: spacing.sm, marginRight: spacing.sm },
-  headerTitleContainer: { flex: 1 },
-  headerTitle: { fontSize: typography.sizes.h2, fontWeight: typography.weights.bold, color: palette.white },
-  headerSubtitle: { fontSize: typography.sizes.body, color: 'rgba(255,255,255,0.8)' },
-  settingsButton: { padding: spacing.sm },
-  
+  weekNavWrap: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.sm, paddingHorizontal: spacing.md },
+  settingsButton: { position: 'absolute', right: spacing.md, padding: spacing.sm },
   weekNav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   weekNavButton: { padding: spacing.sm },
   weekDisplay: { paddingHorizontal: spacing.lg, paddingVertical: spacing.sm },
-  weekText: { fontSize: typography.sizes.bodyLarge, fontWeight: typography.weights.semibold, color: palette.white },
+  weekText: { fontSize: typography.sizes.bodyLarge, fontWeight: typography.weights.semibold, color: colors.textPrimary },
   
-  actionBar: { flexDirection: 'row', padding: spacing.md, gap: spacing.sm, backgroundColor: colors.surface, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
+  actionBar: { flexDirection: 'row', padding: spacing.md, gap: spacing.sm, backgroundColor: '#FFFFFF', borderBottomWidth: 1, borderBottomColor: colors.borderLight },
   actionButton: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.sm, paddingHorizontal: spacing.md, borderRadius: borderRadius.md, borderWidth: 1, borderColor: palette.purple[300], gap: spacing.xs },
   actionButtonText: { fontSize: typography.sizes.body, color: palette.purple[600], fontWeight: typography.weights.medium },
   actionButtonPrimary: { backgroundColor: palette.purple[500], borderColor: palette.purple[500] },
@@ -457,7 +459,7 @@ const styles = StyleSheet.create({
   draftBadge: { backgroundColor: palette.purple[500], paddingHorizontal: 4, paddingVertical: 1, borderRadius: 4 },
   draftBadgeText: { fontSize: 7, color: palette.white, fontWeight: typography.weights.semibold },
   
-  legend: { padding: spacing.lg, backgroundColor: colors.surface, margin: spacing.md, borderRadius: borderRadius.lg },
+  legend: { padding: spacing.lg, backgroundColor: '#FFFFFF', margin: spacing.md, borderRadius: borderRadius.lg },
   legendTitle: { fontSize: typography.sizes.body, fontWeight: typography.weights.semibold, color: colors.textPrimary, marginBottom: spacing.sm },
   legendItems: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
@@ -465,7 +467,7 @@ const styles = StyleSheet.create({
   legendText: { fontSize: typography.sizes.caption, color: colors.textSecondary },
   
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { backgroundColor: colors.surface, borderRadius: borderRadius.xl, padding: spacing.lg, width: '85%', maxWidth: 400 },
+  modalContent: { backgroundColor: '#FFFFFF', borderRadius: borderRadius.xl, padding: spacing.lg, width: '85%', maxWidth: 400 },
   modalTitle: { fontSize: typography.sizes.h3, fontWeight: typography.weights.bold, color: colors.textPrimary, marginBottom: spacing.xs },
   modalSubtitle: { fontSize: typography.sizes.body, color: colors.textSecondary, marginBottom: spacing.lg },
   copyOption: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.borderLight },

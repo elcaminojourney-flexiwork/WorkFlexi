@@ -7,13 +7,12 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
-ImageBackground, Image,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Card, Chip } from 'react-native-paper';
+import { Chip } from 'react-native-paper';
 import { supabase } from '../../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { CardWhite } from '../../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -107,7 +106,8 @@ export default function ShiftApplicationsPage() {
     const worker = item.worker;
 
     return (
-      <TouchableOpacity
+      <CardWhite
+        key={item.id}
         onPress={() =>
           router.push(
             `/employer/worker-profile?workerId=${item.worker_id}&applicationId=${item.id}&from=/employer/shift/shift-applications?shiftId=${shiftIdStr}`
@@ -115,130 +115,77 @@ export default function ShiftApplicationsPage() {
         }
         style={{ marginBottom: 12 }}
       >
-        <Card mode="elevated" style={{ marginBottom: 0 }}>
-          <Card.Content>
-            <View style={styles.rowBetween}>
-              <View>
-                <Text style={styles.nameText}>
-                  {worker?.full_name || 'Unnamed worker'}
-                </Text>
-                <Text style={styles.subText}>
-                  Applied: {formatDate(item.applied_at)}
-                </Text>
-                {item.note ? (
-                  <Text style={styles.noteText}>Note: {item.note}</Text>
-                ) : null}
-              </View>
+        <View style={styles.rowBetween}>
+          <View>
+            <Text style={styles.nameText}>
+              {worker?.full_name || 'Unnamed worker'}
+            </Text>
+            <Text style={styles.subText}>
+              Applied: {formatDate(item.applied_at)}
+            </Text>
+            {item.note ? (
+              <Text style={styles.noteText}>Note: {item.note}</Text>
+            ) : null}
+          </View>
 
-              <Chip
-                mode="flat"
-                style={{ backgroundColor: getStatusColor(item.status) }}
-                textStyle={{ color: '#FFFFFF', fontSize: 12, fontWeight: '600' }}
-              >
-                {item.status}
-              </Chip>
-            </View>
+          <Chip
+            mode="flat"
+            style={{ backgroundColor: getStatusColor(item.status) }}
+            textStyle={{ color: '#FFFFFF', fontSize: 12, fontWeight: '600' }}
+          >
+            {item.status}
+          </Chip>
+        </View>
 
-            <View style={styles.arrowContainer}>
-              <Ionicons name="chevron-forward" size={22} color="#9CA3AF" />
-            </View>
-          </Card.Content>
-        </Card>
-      </TouchableOpacity>
+        <View style={styles.arrowContainer}>
+          <Ionicons name="chevron-forward" size={22} color="#9CA3AF" />
+        </View>
+      </CardWhite>
     );
+  };
+
+  const handleBack = () => {
+    if (from && typeof from === 'string') {
+      router.replace(from as any);
+    } else {
+      router.back();
+    }
   };
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#8B5CF6" />
-        <Text style={styles.loadingText}>Loading applications…</Text>
-      </View>
+      <ConstitutionalScreen title="Shift Applications" showBack onBack={handleBack} showLogo theme="light">
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color="#8B5CF6" />
+          <Text style={styles.loadingText}>Loading applications…</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
   if (!loading && applications.length === 0) {
     return (
-      <View style={styles.screen}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.headerBackButton}
-            onPress={() => {
-              if (from && typeof from === 'string') {
-                router.replace(from as any);
-              } else {
-                router.replace('/employer/applications');
-              }
-            }}
-          >
-            <Ionicons name="arrow-back" size={22} color="#111827" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Shift applications</Text>
-          <View style={{ width: 40 }} />
-        </View>
-
+      <ConstitutionalScreen title="Shift Applications" showBack onBack={handleBack} showLogo theme="light">
         <View style={styles.center}>
           <Text style={styles.emptyText}>No applications yet for this shift.</Text>
         </View>
-      </View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => router.back()}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Shift applications</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Shift Applications" showBack onBack={handleBack} showLogo theme="light">
       <FlatList
         data={applications}
         keyExtractor={(item) => item.id}
         renderItem={renderApplication}
         contentContainerStyle={{ padding: 20 }}
       />
-    </View>
+    </ConstitutionalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
-  logo: { width: 32, height: 32 },
-
-  screen: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  header: {
-    paddingTop: 60,
-    paddingBottom: 16,
-    paddingHorizontal: 20,
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerBackButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#111827',
-  },
   center: {
     flex: 1,
     alignItems: 'center',

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, RefreshControl, ImageBackground, Image, Platform } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, RefreshControl } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../components/ConstitutionalScreen';
 
 const COLORS = { purple100: '#F3E8FF', purple200: '#E9D5FF', purple300: '#D8B4FE', purple400: '#C084FC', purple500: '#A855F7', purple600: '#9333EA', purple700: '#7C3AED', purple800: '#6D28D9', blue100: '#DBEAFE', blue200: '#BFDBFE', blue300: '#93C5FD', blue400: '#60A5FA', blue500: '#3B82F6', blue600: '#2563EB', blue700: '#1D4ED8', white: '#FFFFFF', gray900: '#111827' };
 
@@ -36,60 +36,48 @@ export default function ApplicationsPage() {
   const filtered = apps.filter(a => filter === 'all' || a.status === filter);
   const pendingCount = apps.filter(a => a.status === 'pending').length;
 
+  const titleWithBadge = pendingCount > 0 ? `Applications (${pendingCount})` : 'Applications';
+
   if (loading) {
     return (
-      <ImageBackground source={require('../../assets/images/background.webp')} style={styles.container} resizeMode="cover">
-        <LinearGradient colors={['rgba(139, 92, 246, 0.95)', 'rgba(59, 130, 246, 0.92)', 'rgba(147, 51, 234, 0.90)']} style={StyleSheet.absoluteFillObject} />
-        <View style={styles.logoBox}><Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" /></View>
-        <View style={styles.center}><ActivityIndicator size="large" color="#FFF" /></View>
-      </ImageBackground>
+      <ConstitutionalScreen title="Applications" showBack onBack={() => router.back()} showLogo theme="light">
+        <View style={styles.center}><ActivityIndicator size="large" color="#3B82F6" /></View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <ImageBackground source={require('../../assets/images/background.webp')} style={styles.container} resizeMode="cover">
-      <LinearGradient colors={['rgba(139, 92, 246, 0.95)', 'rgba(59, 130, 246, 0.92)', 'rgba(147, 51, 234, 0.90)']} style={StyleSheet.absoluteFillObject} />
-      <View style={styles.logoBox}><Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" /></View>
-
-      <LinearGradient colors={[COLORS.purple700, COLORS.blue600]} style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}><Ionicons name="arrow-back" size={24} color="#FFF" /></TouchableOpacity>
-        <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>Applications</Text>
-          {pendingCount > 0 && <LinearGradient colors={['#7C3AED', '#6D28D9']} style={styles.badge}><Text style={styles.badgeText}>{pendingCount}</Text></LinearGradient>}
-        </View>
-        <View style={{ width: 44 }} />
-      </LinearGradient>
-
+    <ConstitutionalScreen title={titleWithBadge} showBack onBack={() => router.back()} showLogo theme="light">
       <View style={styles.filterRow}>
         {(['all', 'pending', 'approved', 'rejected'] as const).map((f) => (
           <TouchableOpacity key={f} onPress={() => setFilter(f)}>
-            <LinearGradient colors={filter === f ? [COLORS.purple600, COLORS.blue600] : [COLORS.purple200, COLORS.blue200]} style={styles.filterBtn}>
-              <Text style={[styles.filterText, filter === f && { color: '#FFF' }]}>{f}</Text>
-            </LinearGradient>
+            <View style={[styles.filterBtn, filter === f && styles.filterBtnActive]}>
+              <Text style={[styles.filterText, filter === f && styles.filterTextActive]}>{f}</Text>
+            </View>
           </TouchableOpacity>
         ))}
       </View>
 
-      <ScrollView style={styles.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadApps(); }} tintColor="#FFF" />}>
+      <ScrollView style={styles.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadApps(); }} />}>
         {filtered.length === 0 ? (
-          <LinearGradient colors={[COLORS.purple200, COLORS.blue200]} style={styles.emptyCard}>
+          <PanelBlue style={styles.emptyCard}>
             <Ionicons name="document-text-outline" size={64} color={COLORS.purple600} />
             <Text style={styles.emptyTitle}>No applications</Text>
-          </LinearGradient>
+          </PanelBlue>
         ) : (
           filtered.map((a) => (
-            <LinearGradient key={a.id} colors={[COLORS.purple200, COLORS.blue200]} style={styles.card}>
+            <PanelPurple key={a.id} style={styles.card}>
               <View style={styles.cardHeader}>
-                <LinearGradient colors={[COLORS.purple500, COLORS.blue500]} style={styles.cardAvatar}>
+                <View style={styles.cardAvatar}>
                   <Text style={styles.avatarText}>{a.worker_name?.[0]?.toUpperCase() || '?'}</Text>
-                </LinearGradient>
+                </View>
                 <View style={styles.cardInfo}>
                   <Text style={styles.cardName}>{a.worker_name || 'Unknown'}</Text>
                   <Text style={styles.cardShift}>{a.shift_title}</Text>
                 </View>
-                <LinearGradient colors={a.status === 'pending' ? [COLORS.purple300, COLORS.purple200] : a.status === 'approved' ? [COLORS.blue300, COLORS.blue200] : [COLORS.purple100, COLORS.blue100]} style={styles.statusBadge}>
+                <View style={[styles.statusBadge, a.status === 'pending' && styles.statusBadgePending, a.status === 'approved' && styles.statusBadgeApproved]}>
                   <Text style={styles.statusText}>{a.status}</Text>
-                </LinearGradient>
+                </View>
               </View>
               {a.status === 'pending' && (
                 <View style={styles.actions}>
@@ -97,52 +85,45 @@ export default function ApplicationsPage() {
                     <Ionicons name="close" size={20} color={COLORS.purple700} />
                     <Text style={styles.rejectText}>Reject</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => handleAction(a.id, 'approved')}>
-                    <LinearGradient colors={[COLORS.purple600, COLORS.blue600]} style={styles.approveBtn}>
-                      <Ionicons name="checkmark" size={20} color="#FFF" />
-                      <Text style={styles.approveText}>Approve</Text>
-                    </LinearGradient>
+                  <TouchableOpacity onPress={() => handleAction(a.id, 'approved')} style={styles.approveBtn}>
+                    <Ionicons name="checkmark" size={20} color="#FFF" />
+                    <Text style={styles.approveText}>Approve</Text>
                   </TouchableOpacity>
                 </View>
               )}
-            </LinearGradient>
+            </PanelPurple>
           ))
         )}
         <View style={{ height: 100 }} />
       </ScrollView>
-    </ImageBackground>
+    </ConstitutionalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8 },
-  logo: { width: 32, height: 32 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: Platform.OS === 'web' ? 70 : 100, paddingBottom: 16, paddingHorizontal: 20 },
-  backBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
-  headerCenter: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  headerTitle: { fontSize: 22, fontWeight: '700', color: '#FFF' },
-  badge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
-  badgeText: { fontSize: 12, fontWeight: '700', color: '#FFF' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
   filterRow: { flexDirection: 'row', paddingHorizontal: 16, paddingBottom: 12, gap: 8 },
-  filterBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 16 },
-  filterText: { fontSize: 13, fontWeight: '600', color: COLORS.purple700, textTransform: 'capitalize' },
+  filterBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, backgroundColor: '#E5E7EB' },
+  filterBtnActive: { backgroundColor: COLORS.purple600 },
+  filterText: { fontSize: 13, fontWeight: '600', color: '#374151', textTransform: 'capitalize' },
+  filterTextActive: { color: '#FFF' },
   content: { flex: 1, paddingHorizontal: 16 },
-  emptyCard: { borderRadius: 24, padding: 40, alignItems: 'center' },
+  emptyCard: { borderRadius: 16, padding: 40, alignItems: 'center', marginBottom: 12 },
   emptyTitle: { fontSize: 20, fontWeight: '700', color: COLORS.purple800, marginTop: 16 },
-  card: { borderRadius: 20, padding: 16, marginBottom: 12 },
+  card: { borderRadius: 16, padding: 16, marginBottom: 12 },
   cardHeader: { flexDirection: 'row', alignItems: 'center' },
-  cardAvatar: { width: 52, height: 52, borderRadius: 26, justifyContent: 'center', alignItems: 'center' },
-  avatarText: { fontSize: 20, fontWeight: '700', color: '#FFF' },
+  cardAvatar: { width: 52, height: 52, borderRadius: 26, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.purple200 },
+  avatarText: { fontSize: 20, fontWeight: '700', color: COLORS.purple700 },
   cardInfo: { flex: 1, marginLeft: 16 },
   cardName: { fontSize: 17, fontWeight: '700', color: COLORS.gray900 },
-  cardShift: { fontSize: 14, color: COLORS.purple600, marginTop: 2 },
-  statusBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12 },
-  statusText: { fontSize: 12, fontWeight: '600', color: COLORS.purple700, textTransform: 'capitalize' },
-  actions: { flexDirection: 'row', gap: 12, marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: COLORS.purple300 },
-  rejectBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderRadius: 12, backgroundColor: COLORS.purple100 },
+  cardShift: { fontSize: 14, color: '#6B7280', marginTop: 2 },
+  statusBadge: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, backgroundColor: '#E5E7EB' },
+  statusBadgePending: { backgroundColor: COLORS.purple100 },
+  statusBadgeApproved: { backgroundColor: COLORS.blue100 },
+  statusText: { fontSize: 12, fontWeight: '600', color: '#374151', textTransform: 'capitalize' },
+  actions: { flexDirection: 'row', gap: 12, marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#E5E7EB' },
+  rejectBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderRadius: 12, backgroundColor: COLORS.purple50 },
   rejectText: { fontSize: 14, fontWeight: '600', color: COLORS.purple700 },
-  approveBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderRadius: 12, paddingHorizontal: 20 },
+  approveBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingVertical: 12, borderRadius: 12, paddingHorizontal: 20, backgroundColor: COLORS.purple600 },
   approveText: { fontSize: 14, fontWeight: '600', color: '#FFF' },
 });

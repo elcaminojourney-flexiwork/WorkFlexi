@@ -12,8 +12,6 @@ export default function RotaLayout() {
       <Stack.Screen name="add-shift" />
       <Stack.Screen name="shift/[shiftId]" />
       <Stack.Screen name="team" />
-      <Stack.Screen name="swaps" />
-      <Stack.Screen name="timekeeping" />
       <Stack.Screen name="settings" />
     </Stack>
   );

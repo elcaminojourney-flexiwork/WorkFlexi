@@ -13,9 +13,10 @@ ImageBackground, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import { Button, Card, Chip, SegmentedButtons, Portal } from 'react-native-paper';
+import { Button, Chip, SegmentedButtons, Portal } from 'react-native-paper';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { CardWhite } from '../../components/ConstitutionalScreen';
 
 type Shift = {
   id: string;
@@ -301,19 +302,9 @@ export default function WorkerCalendar() {
   today.setHours(0, 0, 0, 0);
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Calendar</Text>
-        <TouchableOpacity onPress={goToToday}>
-          <Text style={styles.todayButton}>Today</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* View Mode Toggle */}
+    <>
+    <ConstitutionalScreen title="Calendar" showBack onBack={() => router.back()} showLogo theme="light">
+      {/* View Mode Toggle + Today */}
       <View style={styles.viewModeContainer}>
         <SegmentedButtons
           value={viewMode}
@@ -324,7 +315,11 @@ export default function WorkerCalendar() {
           ]}
           style={styles.segmentedButtons}
         />
+        <TouchableOpacity onPress={goToToday} style={{ alignSelf: 'center', marginTop: 8 }}>
+          <Text style={styles.todayButton}>Today</Text>
+        </TouchableOpacity>
       </View>
+
 
       {/* Navigation */}
       <View style={styles.navigationContainer}>
@@ -477,20 +472,20 @@ export default function WorkerCalendar() {
               {formatDateFull(selectedDate)}
             </Text>
             {getShiftsForDate(selectedDate).length === 0 ? (
-              <Card style={styles.emptyCard}>
-                <Card.Content style={styles.emptyCardContent}>
+              <CardWhite style={styles.emptyCard}>
+                <View style={styles.emptyCardContent}>
                   <Ionicons name="calendar-outline" size={48} color="#D1D5DB" />
                   <Text style={styles.emptyCardText}>No shifts on this day</Text>
-                </Card.Content>
-              </Card>
+                </View>
+              </CardWhite>
             ) : (
               getShiftsForDate(selectedDate).map((shift) => (
-                <Card
+                <CardWhite
                   key={shift.id}
                   style={styles.shiftCard}
                   onPress={() => handleShiftPress(shift)}
                 >
-                  <Card.Content>
+                  <View>
                     <View style={styles.shiftCardHeader}>
                       <Text style={styles.shiftCardTitle}>
                         {shift.job_title || 'Shift'}
@@ -528,8 +523,8 @@ export default function WorkerCalendar() {
                         </Text>
                       </View>
                     )}
-                  </Card.Content>
-                </Card>
+                  </View>
+                </CardWhite>
               ))
             )}
           </View>
@@ -538,7 +533,9 @@ export default function WorkerCalendar() {
         <View style={{ height: 40 }} />
       </ScrollView>
 
-      {/* Shift Details Modal */}
+      {/* Shift Details Modal - Portal must be outside ConstitutionalScreen for modal to work */}
+    </ConstitutionalScreen>
+
       <Portal>
         <Modal
           visible={showShiftModal}
@@ -580,8 +577,8 @@ export default function WorkerCalendar() {
                     </View>
 
                     {/* Date and Time */}
-                    <Card style={styles.modalCard}>
-                      <Card.Content>
+                    <CardWhite style={styles.modalCard}>
+                      <View>
                         <View style={styles.modalRow}>
                           <Ionicons name="calendar-outline" size={20} color="#3B82F6" />
                           <View style={styles.modalRowContent}>
@@ -601,13 +598,13 @@ export default function WorkerCalendar() {
                             </Text>
                           </View>
                         </View>
-                      </Card.Content>
-                    </Card>
+                      </View>
+                    </CardWhite>
 
                     {/* Industry */}
                     {selectedShift.industry && (
-                      <Card style={styles.modalCard}>
-                        <Card.Content>
+                      <CardWhite style={styles.modalCard}>
+                        <View>
                           <View style={styles.modalRow}>
                             <Ionicons name="business-outline" size={20} color="#3B82F6" />
                             <View style={styles.modalRowContent}>
@@ -615,38 +612,34 @@ export default function WorkerCalendar() {
                               <Text style={styles.modalRowValue}>{selectedShift.industry}</Text>
                             </View>
                           </View>
-                        </Card.Content>
-                      </Card>
+                        </View>
+                      </CardWhite>
                     )}
 
                     {/* Location */}
                     {(selectedShift.location || selectedShift.location_address) && (
-                      <Card style={styles.modalCard}>
-                        <Card.Title title="Location" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-                        <Card.Content>
-                          <Text style={styles.modalDescriptionText}>
-                            {selectedShift.location || selectedShift.location_address}
-                          </Text>
-                        </Card.Content>
-                      </Card>
+                      <CardWhite style={styles.modalCard}>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Location</Text>
+                        <Text style={styles.modalDescriptionText}>
+                          {selectedShift.location || selectedShift.location_address}
+                        </Text>
+                      </CardWhite>
                     )}
 
                     {/* Description */}
                     {selectedShift.description && (
-                      <Card style={styles.modalCard}>
-                        <Card.Title title="Description" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-                        <Card.Content>
-                          <Text style={styles.modalDescriptionText}>
-                            {selectedShift.description}
-                          </Text>
-                        </Card.Content>
-                      </Card>
+                      <CardWhite style={styles.modalCard}>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Description</Text>
+                        <Text style={styles.modalDescriptionText}>
+                          {selectedShift.description}
+                        </Text>
+                      </CardWhite>
                     )}
 
                     {/* Payment */}
                     {selectedShift.hourly_rate && (
-                      <Card style={styles.modalCard}>
-                        <Card.Content>
+                      <CardWhite style={styles.modalCard}>
+                        <View>
                           <View style={styles.modalRow}>
                             <Ionicons name="cash-outline" size={20} color="#3B82F6" />
                             <View style={styles.modalRowContent}>
@@ -661,8 +654,8 @@ export default function WorkerCalendar() {
                               </Text>
                             </View>
                           </View>
-                        </Card.Content>
-                      </Card>
+                        </View>
+                      </CardWhite>
                     )}
 
                     {/* Action Button */}
@@ -684,7 +677,7 @@ export default function WorkerCalendar() {
           </View>
         </Modal>
       </Portal>
-    </View>
+    </>
   );
 }
 

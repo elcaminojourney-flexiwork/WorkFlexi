@@ -8,8 +8,6 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
-  ImageBackground,
-  Image,
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -18,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { supabase } from '../../../supabase';
 import { palette, colors, gradients, typography, spacing, borderRadius, shadows } from '../../../constants/theme';
 import { createOrganisation, getMyOrganisations, createVenue } from '../../../services/organisations';
+import ConstitutionalScreen, { CardWhite, PanelPurple } from '../../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -147,96 +146,69 @@ export default function OrganisationSetup() {
 
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={palette.purple[500]} />
-        <Text style={styles.loadingText}>Loading...</Text>
-      </View>
+      <ConstitutionalScreen title="My Organisations" showBack onBack={() => router.back()} showLogo theme="light">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={palette.purple[500]} />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </ConstitutionalScreen>
     );
   }
 
-  // Organisation List
   if (step === 'list') {
     return (
-      <View style={styles.container}>
-        <LinearGradient colors={gradients.employer} style={styles.header}>
-          <View style={styles.headerContent}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color={palette.white} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>My Organisations</Text>
-            <View style={{ width: 40 }} />
-          </View>
-        </LinearGradient>
-
-        <ScrollView style={styles.content}>
-          {organisations.length === 0 ? (
-            <View style={styles.emptyState}>
-              <View style={styles.emptyIcon}>
-                <Ionicons name="business-outline" size={64} color={palette.purple[300]} />
-              </View>
-              <Text style={styles.emptyTitle}>No organisations yet</Text>
-              <Text style={styles.emptyText}>
-                Create your organisation to start managing your team and schedules
-              </Text>
+      <ConstitutionalScreen title="My Organisations" showBack onBack={() => router.back()} showLogo theme="light">
+        {organisations.length === 0 ? (
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIcon}>
+              <Ionicons name="business-outline" size={64} color={palette.purple[300]} />
             </View>
-          ) : (
-            organisations.map((org) => (
-              <TouchableOpacity
-                key={org.id}
-                style={styles.orgCard}
-                onPress={() => handleSelectOrg(org)}
-              >
-                <View style={styles.orgIcon}>
-                  <Ionicons name="business" size={28} color={palette.purple[500]} />
-                </View>
-                <View style={styles.orgInfo}>
-                  <Text style={styles.orgName}>{org.name}</Text>
-                  <Text style={styles.orgMeta}>
-                    {org.venues?.length || 0} venue{org.venues?.length !== 1 ? 's' : ''} • {org.team_count || 0} team members
-                  </Text>
-                </View>
-                <Ionicons name="chevron-forward" size={24} color={palette.gray[400]} />
-              </TouchableOpacity>
-            ))
-          )}
+            <Text style={styles.emptyTitle}>No organisations yet</Text>
+            <Text style={styles.emptyText}>
+              Create your organisation to start managing your team and schedules
+            </Text>
+          </View>
+        ) : (
+          organisations.map((org) => (
+            <CardWhite key={org.id} onPress={() => handleSelectOrg(org)} style={styles.orgCard}>
+              <View style={styles.orgIcon}>
+                <Ionicons name="business" size={28} color={palette.purple[500]} />
+              </View>
+              <View style={styles.orgInfo}>
+                <Text style={styles.orgName}>{org.name}</Text>
+                <Text style={styles.orgMeta}>
+                  {org.venues?.length || 0} venue{org.venues?.length !== 1 ? 's' : ''} • {org.team_count || 0} team members
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={24} color={palette.gray[400]} />
+            </CardWhite>
+          ))
+        )}
 
-          <TouchableOpacity
-            style={styles.createButton}
-            onPress={() => setStep('create-org')}
+        <TouchableOpacity
+          style={styles.createButton}
+          onPress={() => setStep('create-org')}
+        >
+          <LinearGradient
+            colors={gradients.primary}
+            style={styles.createButtonGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
           >
-            <LinearGradient
-              colors={gradients.primary}
-              style={styles.createButtonGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-            >
-              <Ionicons name="add-circle" size={24} color={palette.white} />
-              <Text style={styles.createButtonText}>Create New Organisation</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            <Ionicons name="add-circle" size={24} color={palette.white} />
+            <Text style={styles.createButtonText}>Create New Organisation</Text>
+          </LinearGradient>
+        </TouchableOpacity>
 
-          <View style={{ height: 100 }} />
-        </ScrollView>
-      </View>
+        <View style={{ height: 100 }} />
+      </ConstitutionalScreen>
     );
   }
 
-  // Create Organisation Form
   if (step === 'create-org') {
     return (
-      <View style={styles.container}>
-        <LinearGradient colors={gradients.employer} style={styles.header}>
-          <View style={styles.headerContent}>
-            <TouchableOpacity onPress={() => setStep('list')} style={styles.backButton}>
-              <Ionicons name="arrow-back" size={24} color={palette.white} />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>New Organisation</Text>
-            <View style={{ width: 40 }} />
-          </View>
-        </LinearGradient>
-
-        <ScrollView style={styles.content}>
-          <View style={styles.formCard}>
+      <ConstitutionalScreen title="New Organisation" showBack onBack={() => setStep('list')} showLogo theme="light">
+          <PanelPurple style={styles.formCard}>
             <View style={styles.stepIndicator}>
               <View style={styles.stepActive}>
                 <Text style={styles.stepNumber}>1</Text>
@@ -433,9 +405,8 @@ export default function OrganisationSetup() {
                 </>
               )}
             </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </View>
+          </PanelPurple>
+      </ConstitutionalScreen>
     );
   }
 
@@ -447,16 +418,8 @@ const styles = StyleSheet.create({
   logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
   logo: { width: 32, height: 32 },
 
-  container: { flex: 1, backgroundColor: colors.background },
-  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background },
+  loadingContainer: { paddingVertical: spacing.xl },
   loadingText: { marginTop: spacing.md, color: colors.textSecondary },
-  
-  header: { paddingTop: 50, paddingBottom: spacing.lg, paddingHorizontal: spacing.lg },
-  headerContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  backButton: { padding: spacing.sm },
-  headerTitle: { fontSize: typography.sizes.h3, fontWeight: typography.weights.bold, color: palette.white },
-  
-  content: { flex: 1, padding: spacing.lg },
   
   emptyState: { alignItems: 'center', paddingVertical: spacing.xl3 },
   emptyIcon: { width: 120, height: 120, borderRadius: 60, backgroundColor: palette.purple[50], justifyContent: 'center', alignItems: 'center', marginBottom: spacing.lg },
@@ -473,7 +436,7 @@ const styles = StyleSheet.create({
   createButtonGradient: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.lg, gap: spacing.sm },
   createButtonText: { fontSize: typography.sizes.body, fontWeight: typography.weights.semibold, color: palette.white },
   
-  formCard: { backgroundColor: colors.surface, borderRadius: borderRadius.xl, padding: spacing.lg, ...shadows.md },
+  formCard: { marginBottom: spacing.lg },
   
   stepIndicator: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginBottom: spacing.lg },
   stepActive: { width: 32, height: 32, borderRadius: 16, backgroundColor: palette.purple[500], justifyContent: 'center', alignItems: 'center' },

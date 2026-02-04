@@ -16,6 +16,7 @@ import { supabase } from '../../../supabase';
 import { Ionicons } from '@expo/vector-icons';
 import StarRating from '../../../components/StarRating';
 import { createReview, checkReviewExists } from '../../../services/reviews';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../../components/ConstitutionalScreen';
 
 type Timesheet = {
   id: string;
@@ -61,9 +62,13 @@ const COLORS = {
 };
 
 export default function ReviewEmployer() {
-  const { timesheetId } = useLocalSearchParams();
+  const { timesheetId, from } = useLocalSearchParams<{ timesheetId: string; from?: string }>();
   const router = useRouter();
   const normalizedTimesheetId = Array.isArray(timesheetId) ? timesheetId[0] : timesheetId;
+  const onBack = () => {
+    if (from && typeof from === 'string') router.replace(from as any);
+    else router.replace('/worker/my-shifts');
+  };
 
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -300,20 +305,7 @@ export default function ReviewEmployer() {
     if (!employer) missingData.push('employer profile');
     
     return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/worker/my-shifts');
-            }
-          }}>
-            <Ionicons name="arrow-back" size={24} color="#111827" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Review Employer</Text>
-          <View style={{ width: 24 }} />
-        </View>
+      <ConstitutionalScreen title="Review Employer" showBack onBack={onBack} showLogo theme="light">
         <View style={styles.centerContent}>
           <Ionicons name="alert-circle-outline" size={48} color="#7C3AED" />
           <Text style={styles.errorText}>Unable to load review data</Text>
@@ -324,47 +316,32 @@ export default function ReviewEmployer() {
             Please check console for details.
           </Text>
         </View>
-      </View>
+      </ConstitutionalScreen>
     );
   }
 
   const employerName = employer.company_name || employer.full_name || 'Employer';
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-          <TouchableOpacity onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/worker/my-shifts');
-            }
-          }}>
-          <Ionicons name="arrow-back" size={24} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Rate Employer</Text>
-        <View style={{ width: 24 }} />
-      </View>
-
+    <ConstitutionalScreen title="Rate Employer" showBack onBack={onBack} showLogo theme="light">
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Employer Info */}
-        <View style={styles.infoCard}>
+        <PanelPurple style={styles.infoCard}>
           <Text style={styles.employerName}>{employerName}</Text>
           <Text style={styles.shiftInfo}>
             {shift.job_title || 'Shift'} • {formatDate(shift.shift_date)}
           </Text>
-        </View>
+        </PanelPurple>
 
         {/* Overall Experience (Required) */}
-        <View style={styles.section}>
+        <PanelBlue style={styles.section}>
           <StarRating
             rating={overallRating}
             onRatingChange={setOverallRating}
             label="Overall Experience"
             required
           />
-        </View>
+        </PanelBlue>
 
         {/* Additional Ratings */}
         <View style={styles.section}>
@@ -383,10 +360,10 @@ export default function ReviewEmployer() {
             onRatingChange={setManagementRating}
             label="Management"
           />
-        </View>
+        </PanelPurple>
 
         {/* Quick Tags */}
-        <View style={styles.section}>
+        <PanelBlue style={styles.section}>
           <Text style={styles.sectionTitle}>Quick Tags</Text>
           <Text style={styles.sectionSubtitle}>Select all that apply</Text>
           <View style={styles.tagsContainer}>
@@ -437,7 +414,7 @@ export default function ReviewEmployer() {
         </View>
 
         {/* Options */}
-        <View style={styles.section}>
+        <PanelBlue style={styles.section}>
           <TouchableOpacity
             style={styles.checkboxRow}
             onPress={() => setWouldWorkAgain(!wouldWorkAgain)}
@@ -451,7 +428,7 @@ export default function ReviewEmployer() {
               I would work for this employer again
             </Text>
           </TouchableOpacity>
-        </View>
+        </PanelBlue>
 
         {/* Submit Button */}
         <TouchableOpacity
@@ -468,7 +445,7 @@ export default function ReviewEmployer() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

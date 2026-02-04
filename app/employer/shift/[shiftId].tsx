@@ -11,8 +11,9 @@ ImageBackground, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Button, Card, Chip } from 'react-native-paper';
+import { Button, Chip } from 'react-native-paper';
 import { supabase } from '../../../supabase';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../../components/ConstitutionalScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { createEscrowForShift } from '../../../services/payments';
 import { checkReviewExists } from '../../../services/reviews';
@@ -669,21 +670,8 @@ export default function ShiftDetails() {
       : [];
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={handleBack}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Shift details</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Shift details" showBack onBack={handleBack} showLogo theme="light">
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Title + status */}
         <View style={styles.titleRow}>
           <View style={{ flex: 1 }}>
             <Text style={styles.title}>
@@ -702,9 +690,8 @@ export default function ShiftDetails() {
           </Chip>
         </View>
 
-        {/* Industry + date/time + location */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <View>
             {shift.industry ? (
               <View style={styles.row}>
                 <Ionicons name="briefcase-outline" size={16} color="#6B7280" />
@@ -738,13 +725,12 @@ export default function ShiftDetails() {
                 {shift.location || shift.location_address || 'Singapore'}
               </Text>
             </View>
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelPurple>
 
-        {/* Requirements */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Requirements" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Requirements</Text>
+          <View>
 
           <View style={styles.row}>
             <Ionicons name="people-outline" size={16} color="#6B7280" />
@@ -776,17 +762,14 @@ export default function ShiftDetails() {
                 </View>
               )}
             </View>
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelBlue>
 
-        {/* Description */}
         {shift.description ? (
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="Shift description" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content>
-              <Text style={styles.descriptionText}>{shift.description}</Text>
-            </Card.Content>
-          </Card>
+          <PanelPurple style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Shift description</Text>
+            <Text style={styles.descriptionText}>{shift.description}</Text>
+          </PanelPurple>
         ) : null}
 
         {/* Draft shift warning */}
@@ -816,10 +799,9 @@ export default function ShiftDetails() {
           </View>
         )}
 
-        {/* Payment / Escrow */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Payment & escrow" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Payment & escrow</Text>
+          <View>
             <View style={styles.row}>
               <Ionicons name="cash-outline" size={16} color="#6B7280" />
               <Text style={styles.rowLabel}>Hourly rate:</Text>
@@ -873,8 +855,8 @@ export default function ShiftDetails() {
                 completion.
               </Text>
             </View>
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelBlue>
 
         {timesheet && (
           <View style={styles.timesheetButtonWrapper}>
@@ -1006,7 +988,7 @@ export default function ShiftDetails() {
 
         <View style={{ height: 32 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

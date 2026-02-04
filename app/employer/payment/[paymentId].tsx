@@ -11,8 +11,9 @@ ImageBackground, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Card, Chip } from 'react-native-paper';
+import { Chip } from 'react-native-paper';
 import { supabase } from '../../../supabase';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../../components/ConstitutionalScreen';
 import { Ionicons } from '@expo/vector-icons';
 
 type PaymentRecord = {
@@ -61,8 +62,9 @@ const COLORS = {
 };
 
 export default function PaymentInvoiceDetails() {
-  const { paymentId } = useLocalSearchParams();
+  const { paymentId, from } = useLocalSearchParams<{ paymentId: string; from?: string }>();
   const router = useRouter();
+  const onBack = () => { if (from && typeof from === 'string') router.replace(from as any); else router.replace('/employer/payments'); };
   const [loading, setLoading] = useState(true);
   const [payment, setPayment] = useState<PaymentRecord | null>(null);
   const [shift, setShift] = useState<ShiftDetails | null>(null);
@@ -203,25 +205,7 @@ export default function PaymentInvoiceDetails() {
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/employer/payments');
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Invoice</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen title="Invoice" showBack onBack={onBack} showLogo theme="light">
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Invoice Header */}
         <View style={styles.invoiceHeader}>
@@ -285,14 +269,13 @@ export default function PaymentInvoiceDetails() {
                 </Text>
               </View>
             )}
-            </Card.Content>
-          </Card>
+            </View>
+          </PanelPurple>
         )}
 
-        {/* Payment Breakdown */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Payment Breakdown" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Payment Breakdown</Text>
+          <View>
 
           <View style={styles.breakdownRow}>
             <Text style={styles.breakdownLabel}>Regular Hours:</Text>
@@ -358,34 +341,31 @@ export default function PaymentInvoiceDetails() {
               </Text>
             </View>
           )}
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelBlue>
 
-        {/* Payment Status */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Content>
-            <View style={styles.statusRow}>
-              <Text style={styles.statusLabel}>Payment Status:</Text>
-              <Chip
-                mode="flat"
-                icon={() => <Ionicons name="checkmark-circle" size={16} color="#3B82F6" />}
-                style={{ backgroundColor: '#EFF6FF' }}
-                textStyle={{ color: '#1E40AF', fontSize: 12, fontWeight: '600' }}
-              >
-                Released
-              </Chip>
-            </View>
-            {payment.released_at && (
-              <Text style={styles.statusDate}>
-                Released on {formatDate(payment.released_at)}
-              </Text>
-            )}
-          </Card.Content>
-        </Card>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <View style={styles.statusRow}>
+            <Text style={styles.statusLabel}>Payment Status:</Text>
+            <Chip
+              mode="flat"
+              icon={() => <Ionicons name="checkmark-circle" size={16} color="#3B82F6" />}
+              style={{ backgroundColor: '#EFF6FF' }}
+              textStyle={{ color: '#1E40AF', fontSize: 12, fontWeight: '600' }}
+            >
+              Released
+            </Chip>
+          </View>
+          {payment.released_at && (
+            <Text style={styles.statusDate}>
+              Released on {formatDate(payment.released_at)}
+            </Text>
+          )}
+        </PanelPurple>
 
         <View style={{ height: 32 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

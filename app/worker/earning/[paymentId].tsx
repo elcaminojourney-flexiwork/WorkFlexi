@@ -11,8 +11,9 @@ ImageBackground, Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Card, Chip } from 'react-native-paper';
+import { Chip } from 'react-native-paper';
 import { supabase } from '../../../supabase';
+import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../../components/ConstitutionalScreen';
 import { Ionicons } from '@expo/vector-icons';
 
 type PaymentRecord = {
@@ -71,7 +72,7 @@ const COLORS = {
 };
 
 export default function WorkerEarningDetails() {
-  const { paymentId } = useLocalSearchParams();
+  const { paymentId, from } = useLocalSearchParams<{ paymentId: string; from?: string }>();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [payment, setPayment] = useState<PaymentRecord | null>(null);
@@ -267,25 +268,16 @@ export default function WorkerEarningDetails() {
   }
 
   return (
-    <View style={styles.screen}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.headerBackButton}
-          onPress={() => {
-            if (from && typeof from === 'string') {
-              router.replace(from as any);
-            } else {
-              router.replace('/worker/earnings');
-            }
-          }}
-        >
-          <Ionicons name="arrow-back" size={22} color="#111827" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Earning Summary</Text>
-        <View style={{ width: 40 }} />
-      </View>
-
+    <ConstitutionalScreen
+      title="Earning Summary"
+      showBack
+      onBack={() => {
+        if (from && typeof from === 'string') router.replace(from as any);
+        else router.replace('/worker/earnings');
+      }}
+      showLogo
+      theme="light"
+    >
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Earning Header */}
         <View style={styles.earningHeader}>
@@ -304,23 +296,21 @@ export default function WorkerEarningDetails() {
         </View>
 
         {/* Worker Info */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Paid To" titleStyle={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280' }} />
-          <Card.Content>
-            <Text style={styles.workerName}>
-              {worker?.full_name || 'Worker'}
-            </Text>
-            {worker?.email && (
-              <Text style={styles.workerEmail}>{worker.email}</Text>
-            )}
-          </Card.Content>
-        </Card>
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280', marginBottom: 8 }}>Paid To</Text>
+          <Text style={styles.workerName}>
+            {worker?.full_name || 'Worker'}
+          </Text>
+          {worker?.email && (
+            <Text style={styles.workerEmail}>{worker.email}</Text>
+          )}
+        </PanelBlue>
 
         {/* Shift Details */}
         {shift && (
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="Shift Details" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content>
+          <PanelPurple style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Shift Details</Text>
+            <View>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Job Title:</Text>
               <Text style={styles.detailValue}>
@@ -349,15 +339,15 @@ export default function WorkerEarningDetails() {
                 </Text>
               </View>
             )}
-            </Card.Content>
-          </Card>
+            </View>
+          </PanelPurple>
         )}
 
         {/* Hours Worked */}
         {timesheet && (timesheet.clock_in_time || timesheet.clock_out_time) && (
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="Hours Worked" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content>
+          <PanelBlue style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Hours Worked</Text>
+            <View>
             
             {timesheet.clock_in_time && (
               <View style={styles.detailRow}>
@@ -406,14 +396,14 @@ export default function WorkerEarningDetails() {
                 </Text>
               </View>
             )}
-            </Card.Content>
-          </Card>
+            </View>
+          </PanelBlue>
         )}
 
         {/* Payment Breakdown */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Payment Breakdown" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Payment Breakdown</Text>
+          <View>
 
           <View style={styles.breakdownRow}>
             <Text style={styles.breakdownLabel}>Regular Hours:</Text>
@@ -455,12 +445,12 @@ export default function WorkerEarningDetails() {
               {formatCurrency(payment.worker_payout || payment.subtotal || 0)}
             </Text>
           </View>
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelPurple>
 
         {/* Payment Status */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Content>
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <View>
             <View style={styles.statusRow}>
               <Text style={styles.statusLabel}>Payment Status:</Text>
               <Chip
@@ -477,8 +467,8 @@ export default function WorkerEarningDetails() {
                 Payment released on {formatDateTime(payment.released_at)}
               </Text>
             )}
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelBlue>
 
         {/* Review Button (Placeholder for Step 4) */}
         {/* Will be implemented in Step 4 */}
@@ -497,7 +487,7 @@ export default function WorkerEarningDetails() {
 
         <View style={{ height: 32 }} />
       </ScrollView>
-    </View>
+    </ConstitutionalScreen>
   );
 }
 

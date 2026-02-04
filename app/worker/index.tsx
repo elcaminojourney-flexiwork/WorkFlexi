@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, ImageBackground, Image, Platform, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { CardWhite, PanelBlue } from '../../components/ConstitutionalScreen';
 
 const { width } = Dimensions.get('window');
-const COLORS = { purple100: '#F3E8FF', purple200: '#E9D5FF', purple300: '#D8B4FE', purple400: '#C084FC', purple500: '#A855F7', purple600: '#9333EA', purple700: '#7C3AED', purple800: '#6D28D9', blue100: '#DBEAFE', blue200: '#BFDBFE', blue300: '#93C5FD', blue400: '#60A5FA', blue500: '#3B82F6', blue600: '#2563EB', blue700: '#1D4ED8', white: '#FFFFFF', gray900: '#111827' };
+const COLORS = { purple400: '#C084FC', purple500: '#A855F7', purple600: '#9333EA', purple700: '#7C3AED', purple800: '#6D28D9', blue400: '#60A5FA', blue500: '#3B82F6', blue600: '#2563EB', white: '#FFFFFF' };
 
 export default function WorkerDashboard() {
   const router = useRouter();
@@ -39,109 +40,93 @@ export default function WorkerDashboard() {
 
   if (loading) {
     return (
-      <ImageBackground source={require('../../assets/images/background.webp')} style={styles.container} resizeMode="cover">
-        <LinearGradient colors={['rgba(139, 92, 246, 0.95)', 'rgba(59, 130, 246, 0.92)', 'rgba(147, 51, 234, 0.90)']} style={StyleSheet.absoluteFillObject} />
-        <View style={styles.logoBox}><Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" /></View>
-        <View style={styles.center}><ActivityIndicator size="large" color="#FFF" /></View>
-      </ImageBackground>
+      <ConstitutionalScreen title={undefined} showBack={false} showLogo theme="light">
+        <View style={styles.center}><ActivityIndicator size="large" color="#7C3AED" /></View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <ImageBackground source={require('../../assets/images/background.webp')} style={styles.container} resizeMode="cover">
-      <LinearGradient colors={['rgba(139, 92, 246, 0.95)', 'rgba(59, 130, 246, 0.92)', 'rgba(147, 51, 234, 0.90)']} style={StyleSheet.absoluteFillObject} />
-      <View style={styles.logoBox}><Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" /></View>
+    <ConstitutionalScreen title={undefined} showBack={false} showLogo theme="light" scrollable={false}>
+      <ScrollView style={styles.content} contentContainerStyle={styles.contentInner} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} tintColor="#7C3AED" />}>
+        <LinearGradient colors={['#9333EA', '#7C3AED', '#3B82F6']} style={styles.banner}>
+          <View>
+            <Text style={styles.greeting}>Welcome back,</Text>
+            <Text style={styles.userName}>{profile?.full_name || 'Worker'}</Text>
+          </View>
+          <TouchableOpacity onPress={() => router.push('/worker/profile' as any)}>
+            <LinearGradient colors={[COLORS.purple400, COLORS.blue400]} style={styles.avatar}>
+              <Text style={styles.avatarText}>{profile?.full_name?.[0]?.toUpperCase() || 'W'}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </LinearGradient>
 
-      <LinearGradient colors={[COLORS.purple700, COLORS.blue600]} style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Welcome back,</Text>
-          <Text style={styles.userName}>{profile?.full_name || 'Worker'}</Text>
-        </View>
-        <TouchableOpacity onPress={() => router.push('/worker/profile' as any)}>
-          <LinearGradient colors={[COLORS.purple400, COLORS.blue400]} style={styles.avatar}>
-            <Text style={styles.avatarText}>{profile?.full_name?.[0]?.toUpperCase() || 'W'}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </LinearGradient>
-
-      <ScrollView style={styles.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} tintColor="#FFF" />}>
-        
         <View style={styles.statsRow}>
-          <LinearGradient colors={[COLORS.purple400, COLORS.purple300]} style={styles.statCard}>
-            <Ionicons name="briefcase" size={32} color="#FFF" />
+          <CardWhite style={styles.statCard}>
+            <Ionicons name="briefcase" size={28} color="#7C3AED" />
             <Text style={styles.statValue}>{stats.upcoming}</Text>
             <Text style={styles.statLabel}>Upcoming</Text>
-          </LinearGradient>
-          <LinearGradient colors={[COLORS.blue400, COLORS.blue300]} style={styles.statCard}>
-            <Ionicons name="document-text" size={32} color="#FFF" />
-            <Text style={styles.statValue}>{stats.pending}</Text>
+          </CardWhite>
+          <CardWhite style={styles.statCard}>
+            <Ionicons name="document-text" size={28} color="#2563EB" />
+            <Text style={styles.statValueBlue}>{stats.pending}</Text>
             <Text style={styles.statLabel}>Pending</Text>
-          </LinearGradient>
+          </CardWhite>
         </View>
 
-        <LinearGradient colors={[COLORS.purple500, COLORS.blue500]} style={styles.sectionHeader}>
+        <PanelBlue style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
-        </LinearGradient>
+        </PanelBlue>
 
         <View style={styles.menuGrid}>
           {menuItems.map((item, i) => (
-            <TouchableOpacity key={i} style={styles.menuItem} onPress={() => router.push(item.route as any)}>
-              <LinearGradient colors={item.colors} style={styles.menuGradient}>
-                <Ionicons name={item.icon as any} size={36} color="#FFF" />
-                <Text style={styles.menuLabel}>{item.label}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+            <CardWhite key={i} style={styles.menuItem} onPress={() => router.push(item.route as any)}>
+              <Ionicons name={item.icon as any} size={32} color="#7C3AED" />
+              <Text style={styles.menuLabel}>{item.label}</Text>
+            </CardWhite>
           ))}
         </View>
 
-        <LinearGradient colors={[COLORS.purple300, COLORS.blue300]} style={styles.ctaCard}>
-          <LinearGradient colors={[COLORS.purple600, COLORS.blue600]} style={styles.ctaHeader}>
-            <Ionicons name="search" size={24} color="#FFF" />
-            <Text style={styles.ctaTitle}>Find Your Next Shift</Text>
-          </LinearGradient>
-          <View style={styles.ctaBody}>
-            <Text style={styles.ctaText}>Browse available shifts and apply now!</Text>
-            <TouchableOpacity onPress={() => router.push('/worker/browse-shifts' as any)}>
-              <LinearGradient colors={[COLORS.purple600, COLORS.blue600]} style={styles.ctaBtn}>
-                <Text style={styles.ctaBtnText}>Browse Shifts</Text>
-                <Ionicons name="arrow-forward" size={18} color="#FFF" />
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
+        <CardWhite style={styles.ctaCard}>
+          <Text style={styles.ctaTitle}>Find Your Next Shift</Text>
+          <Text style={styles.ctaText}>Browse available shifts and apply now!</Text>
+          <TouchableOpacity onPress={() => router.push('/worker/browse-shifts' as any)} style={styles.ctaBtnWrap}>
+            <LinearGradient colors={[COLORS.purple600, COLORS.blue600]} style={styles.ctaBtn}>
+              <Text style={styles.ctaBtnText}>Browse Shifts</Text>
+              <Ionicons name="arrow-forward" size={18} color="#FFF" />
+            </LinearGradient>
+          </TouchableOpacity>
+        </CardWhite>
 
         <View style={{ height: 100 }} />
       </ScrollView>
-    </ImageBackground>
+    </ConstitutionalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8 },
-  logo: { width: 32, height: 32 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: { paddingTop: Platform.OS === 'web' ? 70 : 100, paddingBottom: 24, paddingHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  banner: { paddingTop: Platform.OS === 'web' ? 70 : 100, paddingBottom: 24, paddingHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   greeting: { fontSize: 14, color: 'rgba(255,255,255,0.8)' },
   userName: { fontSize: 26, fontWeight: '800', color: '#FFF', marginTop: 4 },
   avatar: { width: 52, height: 52, borderRadius: 26, justifyContent: 'center', alignItems: 'center' },
   avatarText: { fontSize: 22, fontWeight: '700', color: '#FFF' },
-  content: { flex: 1, paddingHorizontal: 16 },
-  statsRow: { flexDirection: 'row', gap: 12, marginTop: 8 },
-  statCard: { flex: 1, borderRadius: 20, padding: 20, alignItems: 'center' },
-  statValue: { fontSize: 36, fontWeight: '800', color: '#FFF', marginTop: 8 },
-  statLabel: { fontSize: 13, color: 'rgba(255,255,255,0.9)', marginTop: 4 },
-  sectionHeader: { marginTop: 24, marginBottom: 12, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 16 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#FFF' },
+  content: { flex: 1 },
+  contentInner: { paddingHorizontal: 16, paddingTop: 16 },
+  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
+  statCard: { flex: 1, alignItems: 'center', marginBottom: 0 },
+  statValue: { fontSize: 28, fontWeight: '800', color: '#7C3AED', marginTop: 8 },
+  statValueBlue: { fontSize: 28, fontWeight: '800', color: '#2563EB', marginTop: 8 },
+  statLabel: { fontSize: 13, color: '#64748B', marginTop: 4 },
+  sectionHeader: { marginBottom: 12, marginTop: 0 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#1E293B' },
   menuGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  menuItem: { width: (width - 44) / 2, borderRadius: 20, overflow: 'hidden' },
-  menuGradient: { padding: 24, alignItems: 'center', gap: 12 },
-  menuLabel: { fontSize: 15, fontWeight: '700', color: '#FFF' },
-  ctaCard: { marginTop: 24, borderRadius: 24, overflow: 'hidden' },
-  ctaHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16 },
-  ctaTitle: { fontSize: 18, fontWeight: '700', color: '#FFF' },
-  ctaBody: { padding: 20 },
-  ctaText: { fontSize: 14, color: COLORS.purple800, marginBottom: 16 },
-  ctaBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 16 },
+  menuItem: { width: (width - 44) / 2, alignItems: 'center', gap: 8, marginBottom: 0 },
+  menuLabel: { fontSize: 14, fontWeight: '700', color: '#111827' },
+  ctaCard: { marginTop: 8 },
+  ctaTitle: { fontSize: 18, fontWeight: '700', color: '#111827', marginBottom: 8 },
+  ctaText: { fontSize: 14, color: '#64748B', marginBottom: 16 },
+  ctaBtnWrap: { alignSelf: 'flex-start' },
+  ctaBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, paddingHorizontal: 20, borderRadius: 16 },
   ctaBtnText: { fontSize: 16, fontWeight: '700', color: '#FFF' },
 });

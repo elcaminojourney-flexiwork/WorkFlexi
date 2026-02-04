@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, ImageBackground, Image, Platform, Dimensions } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, RefreshControl, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../supabase';
 import { Ionicons } from '@expo/vector-icons';
+import ConstitutionalScreen, { CardWhite, PanelBlue, PanelPurple } from '../../components/ConstitutionalScreen';
 
 const { width } = Dimensions.get('window');
 const COLORS = { purple100: '#F3E8FF', purple200: '#E9D5FF', purple300: '#D8B4FE', purple400: '#C084FC', purple500: '#A855F7', purple600: '#9333EA', purple700: '#7C3AED', purple800: '#6D28D9', blue100: '#DBEAFE', blue200: '#BFDBFE', blue300: '#93C5FD', blue400: '#60A5FA', blue500: '#3B82F6', blue600: '#2563EB', blue700: '#1D4ED8', white: '#FFFFFF', gray900: '#111827' };
@@ -23,9 +23,17 @@ export default function EmployerDashboard() {
       if (!user) { router.replace('/auth/select-user-type'); return; }
       const { data: p } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       setProfile(p);
-      const { count: sc } = await supabase.from('shifts').select('*', { count: 'exact', head: true }).eq('employer_id', user.id).eq('status', 'open');
-      const { count: ac } = await supabase.from('shift_applications').select('*, shifts!inner(employer_id)', { count: 'exact', head: true }).eq('shifts.employer_id', user.id).eq('status', 'pending');
-      setStats({ activeShifts: sc || 0, pendingApps: ac || 0 });
+      let activeShifts = 0;
+      let pendingApps = 0;
+      try {
+        const { count: sc } = await supabase.from('shifts').select('*', { count: 'exact', head: true }).eq('employer_id', user.id).eq('status', 'open');
+        activeShifts = sc ?? 0;
+      } catch (_) { /* stats may fail if table/RLS not ready */ }
+      try {
+        const { count: ac } = await supabase.from('shift_applications').select('*, shifts!inner(employer_id)', { count: 'exact', head: true }).eq('shifts.employer_id', user.id).eq('status', 'pending');
+        pendingApps = ac ?? 0;
+      } catch (_) { /* optional stats */ }
+      setStats({ activeShifts, pendingApps });
     } catch (e) { console.error(e); } finally { setLoading(false); setRefreshing(false); }
   };
 
@@ -42,110 +50,96 @@ export default function EmployerDashboard() {
 
   if (loading) {
     return (
-      <ImageBackground source={require('../../assets/images/background.webp')} style={styles.container} resizeMode="cover">
-        <LinearGradient colors={['rgba(139, 92, 246, 0.95)', 'rgba(59, 130, 246, 0.92)', 'rgba(147, 51, 234, 0.90)']} style={StyleSheet.absoluteFillObject} />
-        <View style={styles.logoBox}><Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" /></View>
-        <View style={styles.center}><ActivityIndicator size="large" color="#FFF" /><Text style={styles.loadingText}>Loading...</Text></View>
-      </ImageBackground>
+      <ConstitutionalScreen title={undefined} showBack={false} showLogo theme="light">
+        <View style={styles.center}><ActivityIndicator size="large" color="#3B82F6" /><Text style={styles.loadingText}>Loading...</Text></View>
+      </ConstitutionalScreen>
     );
   }
 
   return (
-    <ImageBackground source={require('../../assets/images/background.webp')} style={styles.container} resizeMode="cover">
-      <LinearGradient colors={['rgba(139, 92, 246, 0.95)', 'rgba(59, 130, 246, 0.92)', 'rgba(147, 51, 234, 0.90)']} style={StyleSheet.absoluteFillObject} />
-      <View style={styles.logoBox}><Image source={require('../../assets/images/logo.png')} style={styles.logo} resizeMode="contain" /></View>
-
-      <LinearGradient colors={[COLORS.purple700, COLORS.blue600]} style={styles.header}>
-        <View>
-          <Text style={styles.greeting}>Welcome back,</Text>
-          <Text style={styles.userName}>{profile?.company_name || profile?.full_name || 'Employer'}</Text>
+    <ConstitutionalScreen title={undefined} showBack={false} showLogo theme="light" scrollable={false}>
+      <ScrollView style={styles.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} />}>
+        <View style={styles.welcomeRow}>
+          <View>
+            <Text style={styles.greeting}>Welcome back,</Text>
+            <Text style={styles.userName}>{profile?.company_name || profile?.full_name || 'Employer'}</Text>
+          </View>
+          <TouchableOpacity onPress={() => router.push('/employer/profile' as any)}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{profile?.full_name?.[0]?.toUpperCase() || 'E'}</Text>
+            </View>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={() => router.push('/employer/profile' as any)}>
-          <LinearGradient colors={[COLORS.purple400, COLORS.blue400]} style={styles.avatar}>
-            <Text style={styles.avatarText}>{profile?.full_name?.[0]?.toUpperCase() || 'E'}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      </LinearGradient>
 
-      <ScrollView style={styles.content} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadData(); }} tintColor="#FFF" />}>
-        
         <View style={styles.statsRow}>
-          <LinearGradient colors={[COLORS.purple400, COLORS.purple300]} style={styles.statCard}>
-            <Ionicons name="briefcase" size={32} color={COLORS.white} />
+          <CardWhite style={styles.statCard}>
+            <Ionicons name="briefcase" size={32} color={COLORS.blue600} />
             <Text style={styles.statValue}>{stats.activeShifts}</Text>
             <Text style={styles.statLabel}>Active Shifts</Text>
-          </LinearGradient>
-          <LinearGradient colors={[COLORS.blue400, COLORS.blue300]} style={styles.statCard}>
-            <Ionicons name="document-text" size={32} color={COLORS.white} />
+          </CardWhite>
+          <CardWhite style={styles.statCard}>
+            <Ionicons name="document-text" size={32} color={COLORS.purple600} />
             <Text style={styles.statValue}>{stats.pendingApps}</Text>
             <Text style={styles.statLabel}>Pending Apps</Text>
-          </LinearGradient>
+          </CardWhite>
         </View>
 
-        <LinearGradient colors={[COLORS.purple500, COLORS.blue500]} style={styles.sectionHeader}>
+        <PanelBlue style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
-        </LinearGradient>
+        </PanelBlue>
 
         <View style={styles.menuGrid}>
           {menuItems.map((item, i) => (
-            <TouchableOpacity key={i} style={styles.menuItem} onPress={() => router.push(item.route as any)}>
-              <LinearGradient colors={item.colors} style={styles.menuGradient}>
-                <Ionicons name={item.icon as any} size={36} color={COLORS.white} />
-                <Text style={styles.menuLabel}>{item.label}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+            <CardWhite key={i} style={styles.menuItem} onPress={() => router.push(item.route as any)}>
+              <Ionicons name={item.icon as any} size={36} color={COLORS.purple600} />
+              <Text style={styles.menuLabel}>{item.label}</Text>
+            </CardWhite>
           ))}
         </View>
 
-        <LinearGradient colors={[COLORS.purple300, COLORS.blue300]} style={styles.ctaCard}>
-          <LinearGradient colors={[COLORS.purple600, COLORS.blue600]} style={styles.ctaHeader}>
-            <Ionicons name="flash" size={24} color={COLORS.white} />
+        <PanelPurple style={styles.ctaCard}>
+          <View style={styles.ctaHeader}>
+            <Ionicons name="flash" size={24} color={COLORS.purple700} />
             <Text style={styles.ctaTitle}>Post Your First Shift</Text>
-          </LinearGradient>
+          </View>
           <View style={styles.ctaBody}>
             <Text style={styles.ctaText}>Get started by posting a shift to attract workers</Text>
-            <TouchableOpacity onPress={() => router.push('/employer/post-shift' as any)}>
-              <LinearGradient colors={[COLORS.purple600, COLORS.blue600]} style={styles.ctaBtn}>
-                <Ionicons name="add" size={20} color={COLORS.white} />
-                <Text style={styles.ctaBtnText}>Post Shift</Text>
-              </LinearGradient>
+            <TouchableOpacity onPress={() => router.push('/employer/post-shift' as any)} style={styles.ctaBtn}>
+              <Ionicons name="add" size={20} color="#FFF" />
+              <Text style={styles.ctaBtnText}>Post Shift</Text>
             </TouchableOpacity>
           </View>
-        </LinearGradient>
+        </PanelPurple>
 
         <View style={{ height: 100 }} />
       </ScrollView>
-    </ImageBackground>
+    </ConstitutionalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8 },
-  logo: { width: 32, height: 32 },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  loadingText: { marginTop: 12, fontSize: 16, color: '#FFF', fontWeight: '500' },
-  header: { paddingTop: Platform.OS === 'web' ? 70 : 100, paddingBottom: 24, paddingHorizontal: 20, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  greeting: { fontSize: 14, color: 'rgba(255,255,255,0.8)' },
-  userName: { fontSize: 26, fontWeight: '800', color: '#FFF', marginTop: 4 },
-  avatar: { width: 52, height: 52, borderRadius: 26, justifyContent: 'center', alignItems: 'center' },
-  avatarText: { fontSize: 22, fontWeight: '700', color: '#FFF' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
+  loadingText: { marginTop: 12, fontSize: 16, color: '#6B7280', fontWeight: '500' },
   content: { flex: 1, paddingHorizontal: 16 },
+  welcomeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 16, paddingHorizontal: 4 },
+  greeting: { fontSize: 14, color: '#6B7280' },
+  userName: { fontSize: 22, fontWeight: '800', color: '#111827', marginTop: 4 },
+  avatar: { width: 52, height: 52, borderRadius: 26, justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.purple100 },
+  avatarText: { fontSize: 22, fontWeight: '700', color: COLORS.purple700 },
   statsRow: { flexDirection: 'row', gap: 12, marginTop: 8 },
-  statCard: { flex: 1, borderRadius: 20, padding: 20, alignItems: 'center' },
-  statValue: { fontSize: 36, fontWeight: '800', color: '#FFF', marginTop: 8 },
-  statLabel: { fontSize: 13, color: 'rgba(255,255,255,0.9)', marginTop: 4 },
-  sectionHeader: { marginTop: 24, marginBottom: 12, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 16 },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#FFF' },
+  statCard: { flex: 1, borderRadius: 16, padding: 20, alignItems: 'center' },
+  statValue: { fontSize: 32, fontWeight: '800', color: '#111827', marginTop: 8 },
+  statLabel: { fontSize: 13, color: '#6B7280', marginTop: 4 },
+  sectionHeader: { marginTop: 24, marginBottom: 12, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#1E40AF' },
   menuGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  menuItem: { width: (width - 44) / 2, borderRadius: 20, overflow: 'hidden' },
-  menuGradient: { padding: 24, alignItems: 'center', gap: 12 },
-  menuLabel: { fontSize: 15, fontWeight: '700', color: '#FFF' },
-  ctaCard: { marginTop: 24, borderRadius: 24, overflow: 'hidden' },
-  ctaHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16 },
-  ctaTitle: { fontSize: 18, fontWeight: '700', color: '#FFF' },
+  menuItem: { width: (width - 44) / 2, borderRadius: 16, padding: 20, alignItems: 'center' },
+  menuLabel: { fontSize: 15, fontWeight: '700', color: '#111827', marginTop: 8 },
+  ctaCard: { marginTop: 24, borderRadius: 16, overflow: 'hidden' },
+  ctaHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, backgroundColor: 'rgba(147, 51, 234, 0.12)' },
+  ctaTitle: { fontSize: 18, fontWeight: '700', color: COLORS.purple700 },
   ctaBody: { padding: 20 },
-  ctaText: { fontSize: 14, color: COLORS.purple800, marginBottom: 16 },
-  ctaBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 16 },
+  ctaText: { fontSize: 14, color: '#6B7280', marginBottom: 16 },
+  ctaBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, paddingHorizontal: 24, borderRadius: 12, backgroundColor: COLORS.purple600 },
   ctaBtnText: { fontSize: 16, fontWeight: '700', color: '#FFF' },
 });
