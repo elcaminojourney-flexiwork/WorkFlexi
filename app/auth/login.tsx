@@ -74,8 +74,8 @@ export default function LoginPage() {
       console.error('❌ Login error:', error);
       
       let message = 'Login failed. Please try again.';
-      if (error.message?.includes('timeout')) {
-        message = 'Connection timed out. Please check your internet.';
+      if (error.message?.includes('timeout') || error.message?.includes('Failed to fetch') || error.message?.includes('fetch')) {
+        message = 'Cannot reach the server. Check your internet connection. If the app was working before, the backend may be paused (e.g. Supabase free tier).';
       } else if (error.message?.includes('Invalid login')) {
         message = 'Invalid email or password.';
       } else if (error.message) {
@@ -185,10 +185,10 @@ export default function LoginPage() {
             </TouchableOpacity>
           </LinearGradient>
 
-          {/* Register Link */}
+          {/* Register Link – direct to Create Account (no extra selection page) */}
           <View style={styles.registerRow}>
             <Text style={styles.registerText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => router.push('/auth/select-user-type')}>
+            <TouchableOpacity onPress={() => router.push('/auth/register?type=worker')}>
               <Text style={styles.registerLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>

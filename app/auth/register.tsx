@@ -64,7 +64,11 @@ export default function RegisterPage() {
         router.replace(`/${userType}/onboarding` as any);
       }
     } catch (error: any) {
-      Alert.alert('Registration Failed', error.message);
+      const msg = (error.message || '').toLowerCase();
+      const friendly = (msg.includes('fetch') || msg.includes('network')) 
+        ? 'Cannot reach the server. Check your internet. If the app worked before, the backend may be paused (Supabase dashboard).'
+        : error.message;
+      Alert.alert('Registration Failed', friendly);
     } finally {
       setLoading(false);
     }
@@ -90,6 +94,9 @@ export default function RegisterPage() {
             </View>
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Join FlexiWork as {isEmployer ? 'an Employer' : 'a Worker'}</Text>
+            <TouchableOpacity onPress={() => router.replace(`/auth/register?type=${isEmployer ? 'worker' : 'employer'}` as any)} style={styles.switchTypeBtn}>
+              <Text style={styles.switchTypeText}>{isEmployer ? 'Sign up as Worker instead' : 'Sign up as Employer instead'}</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Register Card */}
@@ -209,4 +216,6 @@ const styles = StyleSheet.create({
 
   backBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 16 },
   backText: { fontSize: 16, fontWeight: '600', color: COLORS.white },
+  switchTypeBtn: { marginTop: 8 },
+  switchTypeText: { fontSize: 14, color: 'rgba(255,255,255,0.95)', fontWeight: '600', textDecorationLine: 'underline' },
 });
