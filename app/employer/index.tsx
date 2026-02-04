@@ -37,15 +37,17 @@ export default function EmployerDashboard() {
     } catch (e) { console.error(e); } finally { setLoading(false); setRefreshing(false); }
   };
 
-  const menuItems = [
-    { icon: 'add-circle', label: 'Post Shift', route: '/employer/post-shift', colors: [COLORS.purple600, COLORS.blue600] },
-    { icon: 'calendar', label: 'My Shifts', route: '/employer/my-shifts', colors: [COLORS.blue600, COLORS.purple600] },
-    { icon: 'people', label: 'My Team', route: '/employer/my-team', colors: [COLORS.purple700, COLORS.blue700] },
-    { icon: 'document-text', label: 'Applications', route: '/employer/applications', colors: [COLORS.blue700, COLORS.purple700] },
-    { icon: 'heart', label: 'Favorites', route: '/employer/favorites', colors: [COLORS.purple500, COLORS.purple700] },
-    { icon: 'card', label: 'Payments', route: '/employer/payments', colors: [COLORS.blue500, COLORS.blue700] },
-    { icon: 'grid', label: 'Rota', route: '/employer/rota', colors: [COLORS.purple600, COLORS.blue500] },
-    { icon: 'settings', label: 'Settings', route: '/employer/settings', colors: [COLORS.blue600, COLORS.purple500] },
+  const quickActions = [
+    { icon: 'add-circle', label: 'Post Shift', route: '/employer/post-shift' },
+    { icon: 'calendar', label: 'My Shifts', route: '/employer/my-shifts' },
+    { icon: 'people', label: 'My Team', route: '/employer/my-team' },
+    { icon: 'document-text', label: 'Applications', route: '/employer/applications' },
+  ];
+  const moreItems = [
+    { icon: 'heart', label: 'Favorites', route: '/employer/favorites' },
+    { icon: 'card', label: 'Payments', route: '/employer/payments' },
+    { icon: 'grid', label: 'Rota', route: '/employer/rota' },
+    { icon: 'settings', label: 'Settings', route: '/employer/settings' },
   ];
 
   if (loading) {
@@ -88,9 +90,22 @@ export default function EmployerDashboard() {
           <Text style={styles.sectionTitle}>Quick Actions</Text>
         </PanelBlue>
 
-        <View style={styles.menuGrid}>
-          {menuItems.map((item, i) => (
-            <CardWhite key={i} style={styles.menuItem} onPress={() => router.push(item.route as any)}>
+        <View style={styles.quickActionsGrid}>
+          {quickActions.map((item, i) => (
+            <CardWhite key={i} style={styles.quickActionCard} onPress={() => router.push(item.route as any)}>
+              <Ionicons name={item.icon as any} size={36} color={COLORS.purple600} />
+              <Text style={styles.menuLabel}>{item.label}</Text>
+            </CardWhite>
+          ))}
+        </View>
+
+        <PanelBlue style={[styles.sectionHeader, { marginTop: 20 }]}>
+          <Text style={styles.sectionTitle}>More</Text>
+        </PanelBlue>
+
+        <View style={styles.quickActionsGrid}>
+          {moreItems.map((item, i) => (
+            <CardWhite key={i} style={styles.quickActionCard} onPress={() => router.push(item.route as any)}>
               <Ionicons name={item.icon as any} size={36} color={COLORS.purple600} />
               <Text style={styles.menuLabel}>{item.label}</Text>
             </CardWhite>
@@ -132,8 +147,8 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 13, color: '#6B7280', marginTop: 4 },
   sectionHeader: { marginTop: 24, marginBottom: 12, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12 },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: '#1E40AF' },
-  menuGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  menuItem: { width: (width - 44) / 2, borderRadius: 16, padding: 20, alignItems: 'center' },
+  quickActionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  quickActionCard: { width: (width - 32 - 12) / 2, minHeight: 120, borderRadius: 16, padding: 20, alignItems: 'center', justifyContent: 'center' },
   menuLabel: { fontSize: 15, fontWeight: '700', color: '#111827', marginTop: 8 },
   ctaCard: { marginTop: 24, borderRadius: 16, overflow: 'hidden' },
   ctaHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, backgroundColor: 'rgba(147, 51, 234, 0.12)' },

@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
   progressLine: { width: 36, height: 4, backgroundColor: 'rgba(255,255,255,0.3)', marginHorizontal: 4 },
   progressLineActive: { backgroundColor: '#FFFFFF' },
   content: { flex: 1 },
-  card: { borderRadius: 24, marginBottom: 16, overflow: 'hidden', padding: 0 },
+  card: { borderRadius: 20, marginBottom: 16, overflow: 'hidden', padding: 0, borderWidth: 1, borderColor: '#E5E7EB', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 20, marginHorizontal: -20, marginTop: -20 },
   cardTitle: { fontSize: 20, fontWeight: '700', color: '#FFFFFF' },
   cardBody: { padding: 20 },
