@@ -360,7 +360,7 @@ export default function ReviewEmployer() {
             onRatingChange={setManagementRating}
             label="Management"
           />
-        </PanelPurple>
+        </View>
 
         {/* Quick Tags */}
         <PanelBlue style={styles.section}>
@@ -392,7 +392,7 @@ export default function ReviewEmployer() {
               </TouchableOpacity>
             ))}
           </View>
-        </View>
+        </PanelBlue>
 
         {/* Written Review */}
         <View style={styles.section}>

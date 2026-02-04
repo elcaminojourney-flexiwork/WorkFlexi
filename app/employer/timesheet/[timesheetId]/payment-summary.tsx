@@ -525,8 +525,7 @@ export default function PaymentSummary() {
                 </Text>
               </View>
             )}
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
         {/* Release Payment Button */}
         {!isAlreadyReleased && timesheet.employer_confirmed && (

@@ -299,9 +299,8 @@ export default function OrganisationSetup() {
                 </>
               )}
             </TouchableOpacity>
-          </View>
-        </ScrollView>
-      </View>
+          </PanelPurple>
+      </ConstitutionalScreen>
     );
   }
 
@@ -405,8 +404,9 @@ export default function OrganisationSetup() {
                 </>
               )}
             </TouchableOpacity>
-          </PanelPurple>
-      </ConstitutionalScreen>
+          </View>
+        </ScrollView>
+      </View>
     );
   }
 

@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import ConstitutionalScreen, { PanelPurple } from '../../components/ConstitutionalScreen';
+import ConstitutionalScreen, { PanelPurple } from '../../../components/ConstitutionalScreen';
 
 
 // Modern FlexiWork Colors
@@ -112,7 +112,7 @@ export default function PaymentMethodsScreen() {
             <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
             <Text style={styles.saveButtonText}>Save mock payment method</Text>
           </TouchableOpacity>
-        </View>
+        </PanelPurple>
 
         {/* Info Box */}
         <View style={styles.infoBox}>

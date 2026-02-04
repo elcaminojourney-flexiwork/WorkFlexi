@@ -241,8 +241,7 @@ export default function DisputeTimesheet() {
               multiline
               numberOfLines={4}
             />
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
         <TouchableOpacity
           style={[

@@ -10,9 +10,9 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import ConstitutionalScreen, { PanelPurple } from '../../../components/ConstitutionalScreen';
-import { getRotaShift } from '../../../services/rota';
-import { palette, colors, typography, spacing, borderRadius } from '../../../constants/theme';
+import ConstitutionalScreen, { PanelPurple } from '../../../../components/ConstitutionalScreen';
+import { getRotaShift } from '../../../../services/rota';
+import { palette, colors, typography, spacing, borderRadius } from '../../../../constants/theme';
 
 export default function RotaShiftDetail() {
   const router = useRouter();

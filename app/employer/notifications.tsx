@@ -6,7 +6,7 @@ import {
   ScrollView,
   Switch,
   TouchableOpacity,
-ImageBackground, Image,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -31,7 +31,7 @@ export default function NotificationSettings() {
   const [marketing, setMarketing] = useState(false);
 
   return (
-    <View style={styles.screen}>
+    <ConstitutionalScreen theme="light">
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -46,28 +46,26 @@ export default function NotificationSettings() {
 
       {/* Content */}
       <ScrollView style={styles.container}>
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Shift notifications" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-            <View style={styles.row}>
-              <Text style={styles.label}>New applications</Text>
-              <Switch
-                value={newApplications}
-                onValueChange={setNewApplications}
-                trackColor={{ false: '#DDD', true: '#8B5CF6' }}
-                thumbColor="#FFF"
-              />
-            </View>
-
-            <View style={styles.row}>
-              <Text style={styles.label}>Shift updates</Text>
-              <Switch
-                value={shiftUpdates}
-                onValueChange={setShiftUpdates}
-                trackColor={{ false: '#DDD', true: '#8B5CF6' }}
-                thumbColor="#FFF"
-              />
-            </View>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Shift notifications</Text>
+          <View style={styles.row}>
+            <Text style={styles.label}>New applications</Text>
+            <Switch
+              value={newApplications}
+              onValueChange={setNewApplications}
+              trackColor={{ false: '#DDD', true: '#8B5CF6' }}
+              thumbColor="#FFF"
+            />
+          </View>
+          <View style={styles.row}>
+            <Text style={styles.label}>Shift updates</Text>
+            <Switch
+              value={shiftUpdates}
+              onValueChange={setShiftUpdates}
+              trackColor={{ false: '#DDD', true: '#8B5CF6' }}
+              thumbColor="#FFF"
+            />
+          </View>
         </PanelPurple>
 
         <PanelBlue style={{ marginBottom: 12 }}>

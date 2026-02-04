@@ -319,25 +319,23 @@ export default function TimesheetInvoiceDetails() {
             {employer?.email && (
               <Text style={styles.companyEmail}>{employer.email}</Text>
             )}
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
         {/* Worker Info */}
         {worker && (
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="TO" titleStyle={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280' }} />
-            <Card.Content>
-              <Text style={styles.companyName}>
-                {worker.full_name || 'Worker'}
+          <PanelPurple style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280', marginBottom: 8 }}>TO</Text>
+            <Text style={styles.companyName}>
+              {worker.full_name || 'Worker'}
+            </Text>
+            {worker.phone && (
+              <Text style={styles.companyEmail}>{worker.phone}</Text>
+            )}
+            {worker.bank_account_number && (
+              <Text style={styles.companyEmail}>
+                Bank: ****{worker.bank_account_number.slice(-4)}
               </Text>
-              {worker.phone && (
-                <Text style={styles.companyEmail}>{worker.phone}</Text>
-              )}
-              {worker.bank_account_number && (
-                <Text style={styles.companyEmail}>
-                  Bank: ****{worker.bank_account_number.slice(-4)}
-                </Text>
-              )}
+            )}
           </PanelPurple>
         )}
 

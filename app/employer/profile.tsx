@@ -291,14 +291,13 @@ export default function EmployerProfileScreen() {
                 {profile.billing_email || profile.email || 'Not set'}
               </Text>
             </View>
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelBlue>
 
         {/* Status + trust */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Account status" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-          <Card.Content>
-            <View style={styles.row}>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Account status</Text>
+          <View style={styles.row}>
               <Text style={styles.label}>Profile status</Text>
               <Text style={styles.value}>
                 {formatProfileStatus(profile.profile_status)}
@@ -337,7 +336,6 @@ export default function EmployerProfileScreen() {
                   : 'No reviews yet'}
               </Text>
             </View>
-          </View>
         </PanelPurple>
 
         {/* Reviews */}
@@ -368,27 +366,21 @@ export default function EmployerProfileScreen() {
               )}
             </>
           )}
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelBlue>
 
         {/* Notifications */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title 
-            title="Notifications" 
-            titleStyle={{ fontSize: 16, fontWeight: 'bold' }} 
-          />
-          <Card.Content style={{ paddingVertical: 8 }}>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Notifications</Text>
+          <View style={{ paddingVertical: 8 }}>
             <NotificationList userId={profile.id} limit={10} />
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelPurple>
 
         {/* Settings */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title 
-            title="Settings" 
-            titleStyle={{ fontSize: 16, fontWeight: 'bold' }} 
-          />
-          <Card.Content>
+        <PanelBlue style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Settings</Text>
+          <View>
             <TouchableOpacity
               style={styles.settingsItem}
               onPress={() => router.push('/employer/settings')}
@@ -397,8 +389,8 @@ export default function EmployerProfileScreen() {
               <Text style={styles.settingsItemText}>Settings</Text>
               <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
             </TouchableOpacity>
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelBlue>
 
         {/* Buttons */}
         <View style={styles.buttonRow}>

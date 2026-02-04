@@ -224,23 +224,20 @@ export default function PaymentInvoiceDetails() {
         </View>
 
         {/* Employer Info */}
-        <Card mode="elevated" style={{ marginBottom: 12 }}>
-          <Card.Title title="Bill To" titleStyle={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280' }} />
-          <Card.Content>
-            <Text style={styles.companyName}>
-              {employer?.company_name || 'Employer'}
-            </Text>
-            {employer?.email && (
-              <Text style={styles.companyEmail}>{employer.email}</Text>
-            )}
-          </Card.Content>
-        </Card>
+        <PanelPurple style={{ marginBottom: 12 }}>
+          <Text style={{ fontSize: 14, fontWeight: 'bold', color: '#6B7280', marginBottom: 8 }}>Bill To</Text>
+          <Text style={styles.companyName}>
+            {employer?.company_name || 'Employer'}
+          </Text>
+          {employer?.email && (
+            <Text style={styles.companyEmail}>{employer.email}</Text>
+          )}
+        </PanelPurple>
 
         {/* Shift Details */}
         {shift && (
-          <Card mode="elevated" style={{ marginBottom: 12 }}>
-            <Card.Title title="Shift Details" titleStyle={{ fontSize: 16, fontWeight: 'bold' }} />
-            <Card.Content>
+          <PanelPurple style={{ marginBottom: 12 }}>
+            <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>Shift Details</Text>
             <View style={styles.detailRow}>
               <Text style={styles.detailLabel}>Job Title:</Text>
               <Text style={styles.detailValue}>
@@ -269,7 +266,6 @@ export default function PaymentInvoiceDetails() {
                 </Text>
               </View>
             )}
-            </View>
           </PanelPurple>
         )}
 

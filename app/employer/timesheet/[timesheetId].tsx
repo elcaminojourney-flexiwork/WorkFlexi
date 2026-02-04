@@ -620,8 +620,7 @@ export default function EmployerTimesheetDetails() {
               time or change clock-in / clock-out. Any overtime will be billed
               automatically when you approve.
             </Text>
-          </Card.Content>
-        </Card>
+        </PanelPurple>
 
           {/* Step 1: Confirm timesheet button - only show if clocked in/out and not confirmed */}
           {timesheet.clock_in_time &&

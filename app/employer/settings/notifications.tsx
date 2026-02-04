@@ -216,17 +216,16 @@ export default function EmployerNotificationSettingsScreen() {
                 />
               )}
             />
-          </Card.Content>
-        </Card>
+          </View>
+        </PanelPurple>
 
         {/* In-App Notifications Section */}
-        <Card mode="elevated" style={styles.section}>
-          <Card.Title
-            title="In-App Notifications"
-            titleStyle={styles.sectionTitle}
-            left={(props) => <Ionicons name="notifications-outline" size={24} color="#6D28D9" />}
-          />
-          <Card.Content>
+        <PanelBlue style={styles.section}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+            <Ionicons name="notifications-outline" size={24} color="#6D28D9" />
+            <Text style={styles.sectionTitle}>In-App Notifications</Text>
+          </View>
+          <View>
             <List.Item
               title="New Applications"
               description="Show notifications in the app"

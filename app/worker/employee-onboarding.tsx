@@ -267,7 +267,7 @@ export default function EmployeeOnboardingPage() {
           </View>
         </View>
       </View>
-    </ScrollView>
+    </ConstitutionalScreen>
   );
 }
 
