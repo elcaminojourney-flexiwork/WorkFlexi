@@ -17,8 +17,8 @@ export default function IndexPage() {
   useEffect(() => {
     const forceTimer = setTimeout(() => {
       if (!didRedirect.current) {
-        console.log('⏱️ Force redirect to main entry (select-user-type)');
-        doRedirect('/auth/select-user-type');
+        console.log('⏱️ Force redirect to employer (starting page)');
+        doRedirect('/employer');
       }
     }, MAX_WAIT);
 
@@ -63,8 +63,8 @@ export default function IndexPage() {
       const { data: { session }, error } = await supabase.auth.getSession();
       
       if (error || !session) {
-        console.log('📭 No session, redirecting to main entry (Welcome Worker/Employer)');
-        doRedirect('/auth/select-user-type');
+        console.log('📭 No session, redirecting to employer (starting page)');
+        doRedirect('/employer');
         return;
       }
 
@@ -77,7 +77,7 @@ export default function IndexPage() {
 
       if (!profile) {
         console.log('❌ No profile found');
-        doRedirect('/auth/select-user-type');
+        doRedirect('/employer');
         return;
       }
 
@@ -90,7 +90,7 @@ export default function IndexPage() {
 
     } catch (err) {
       console.error('❌ Auth check error:', err);
-      doRedirect('/auth/select-user-type');
+      doRedirect('/employer');
     }
   };
 
