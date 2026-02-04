@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "FlexiWork",
+    "slug": "flexiwork",
+    "version": "6.0.0",
+    "orientation": "portrait",
+    "platforms": ["web"],
+    "icon": "./assets/images/icon.png",
+    "scheme": "flexiwork",
+    "userInterfaceStyle": "light",
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/favicon.png",
+      "name": "FlexiWork",
+      "shortName": "FlexiWork",
+      "lang": "en",
+      "themeColor": "#7C3AED",
+      "backgroundColor": "#F8FAFC",
+      "display": "standalone",
+      "orientation": "portrait",
+      "description": "Workforce Management & Gig Marketplace"
+    },
+    "plugins": [
+      ["expo-router", { "root": "./app" }]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "baseUrl": "./"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      }
+    }
+  }
+}
