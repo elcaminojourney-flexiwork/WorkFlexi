@@ -1,13 +1,9 @@
-// supabase.js - FlexiWork Supabase Client (native: iOS/Android). Web uses supabase.web.js
+// supabase.web.js - FlexiWork Supabase Client (web only, no native AsyncStorage)
 import { createClient } from '@supabase/supabase-js';
-import { Platform } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// === SUPABASE CONFIG ===
 const supabaseUrl = 'https://gqhcuwwzjowdplfyizyb.supabase.co';
 const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdxaGN1d3d6am93ZHBsZnlpenliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU1NTQ3ODMsImV4cCI6MjA1MTEzMDc4M30.5dxURJnuMKf0gOFxEwdnLLfnf-N5Y9f_wq0DTxcHhq8';
 
-// === STORAGE ADAPTER ===
 const webStorage = {
   getItem: (key) => {
     try {
@@ -30,15 +26,12 @@ const webStorage = {
   },
 };
 
-const storage = Platform.OS === 'web' ? webStorage : AsyncStorage;
-
-// === CREATE CLIENT ===
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    storage,
+    storage: webStorage,
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: Platform.OS === 'web',
+    detectSessionInUrl: true,
   },
 });
 
