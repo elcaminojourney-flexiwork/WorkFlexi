@@ -69,6 +69,7 @@ export default function HomeScreen() {
         </ThemedText>
       </ThemedView>
     </ParallaxScrollView>
+    </ImageBackground>
   );
 }
 

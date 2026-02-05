@@ -159,6 +159,7 @@ export default function ProfileSelectorScreen() {
         <View style={{ height: 40 }} />
       </ScrollView>
     </View>
+    </ImageBackground>
   );
 }
 
