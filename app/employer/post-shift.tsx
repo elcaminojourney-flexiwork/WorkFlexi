@@ -78,7 +78,7 @@ export default function PostShift() {
       if (!user) { router.replace('/auth/select-user-type'); return; }
 
       const calc = calculateShiftDetails();
-      const { data: shift, error } = await supabase.from('shifts').insert([{
+      const insertPromise = supabase.from('shifts').insert([{
         employer_id: user.id, title: jobTitle.trim(), job_title: jobTitle.trim(), job_role: jobTitle.trim(),
         industry, description: description.trim(),
         shift_date: shiftDate.toISOString().split('T')[0],
@@ -89,12 +89,35 @@ export default function PostShift() {
         hourly_rate: parseFloat(hourlyRate), total_cost: calc.workerCost, platform_fee: calc.platformFee, total_amount: calc.totalAmount,
         visibility, status: 'open', payment_status: 'pending',
       }]).select().single();
+      const timeoutMs = 20000;
+      const { data: shift, error } = await Promise.race([
+        insertPromise,
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('A kérés túl sokáig tart. Ellenőrizd a kapcsolatot, majd próbáld újra.')), timeoutMs)
+        ),
+      ]);
       if (error) throw error;
-      Alert.alert('Success!', 'Shift posted!', [{ text: 'View', onPress: () => router.replace(`/employer/shift/${shift.id}`) }]);
+      Alert.alert(
+        'Sikeres',
+        'A shift posztolva.',
+        [
+          { text: 'Dashboard', onPress: () => router.replace('/employer') },
+          { text: 'Shift megtekintése', onPress: () => router.replace(`/employer/shift/${shift.id}`) },
+        ]
+      );
     } catch (err: any) {
+      console.error('Publish shift error:', err);
+      const is500 = err?.status === 500 || err?.code === '500' || (err?.message && String(err.message).includes('500'));
       const msg = err?.message || err?.error_description || String(err);
       const details = err?.details ? ` (${err.details})` : '';
-      Alert.alert('Error', (msg + details) || 'Failed to post shift. If you see 500, run the shifts RLS SQL in Supabase SQL Editor.');
+      const title = is500 ? 'Szerver hiba (500)' : 'Hiba';
+      const body = is500
+        ? 'A shift posztolása sikertelen. Futtasd a Supabase SQL Editorban a projekt supabase/RUN_THIS_FIX_SUPABASE_SHIFTS.sql fájl tartalmát (másold be, Run), majd próbáld újra.'
+        : (msg + details) || 'Nem sikerült posztolni a shiftet.';
+      Alert.alert(title, body, [
+        { text: 'Vissza a dashboardra', onPress: () => router.replace('/employer') },
+        { text: 'Újra', onPress: () => {} },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -175,6 +198,17 @@ export default function PostShift() {
                   <Text style={styles.dateBtnText}>{formatDate(shiftDate)}</Text>
                 </LinearGradient>
               </TouchableOpacity>
+              {showDatePicker && (
+                <View style={styles.pickerInline}>
+                  <DateTimePicker
+                    mode="date"
+                    value={shiftDate}
+                    onChange={(_, date) => {
+                      if (date) { setShiftDate(date); setShowDatePicker(false); }
+                    }}
+                  />
+                </View>
+              )}
 
               <View style={styles.timeRow}>
                 <View style={styles.timeCol}>
@@ -185,6 +219,17 @@ export default function PostShift() {
                       <Text style={styles.dateBtnText}>{formatTime(startTime)}</Text>
                     </LinearGradient>
                   </TouchableOpacity>
+                  {showStartTimePicker && (
+                    <View style={styles.pickerInline}>
+                      <DateTimePicker
+                        mode="time"
+                        value={startTime}
+                        onChange={(_, date) => {
+                          if (date) { setStartTime(date); setShowStartTimePicker(false); }
+                        }}
+                      />
+                    </View>
+                  )}
                 </View>
                 <View style={styles.timeCol}>
                   <Text style={styles.label}>End *</Text>
@@ -194,6 +239,17 @@ export default function PostShift() {
                       <Text style={styles.dateBtnText}>{formatTime(endTime)}</Text>
                     </LinearGradient>
                   </TouchableOpacity>
+                  {showEndTimePicker && (
+                    <View style={styles.pickerInline}>
+                      <DateTimePicker
+                        mode="time"
+                        value={endTime}
+                        onChange={(_, date) => {
+                          if (date) { setEndTime(date); setShowEndTimePicker(false); }
+                        }}
+                      />
+                    </View>
+                  )}
                 </View>
               </View>
 
@@ -300,34 +356,6 @@ export default function PostShift() {
           </LinearGradient>
         </TouchableOpacity>
       </View>
-
-      {showDatePicker && (
-        <DateTimePicker
-          mode="date"
-          value={shiftDate}
-          onChange={(_, date) => {
-            if (date) { setShiftDate(date); setShowDatePicker(false); }
-          }}
-        />
-      )}
-      {showStartTimePicker && (
-        <DateTimePicker
-          mode="time"
-          value={startTime}
-          onChange={(_, date) => {
-            if (date) { setStartTime(date); setShowStartTimePicker(false); }
-          }}
-        />
-      )}
-      {showEndTimePicker && (
-        <DateTimePicker
-          mode="time"
-          value={endTime}
-          onChange={(_, date) => {
-            if (date) { setEndTime(date); setShowEndTimePicker(false); }
-          }}
-        />
-      )}
     </ConstitutionalScreen>
   );
 }
@@ -355,6 +383,7 @@ const styles = StyleSheet.create({
   radioText: { fontSize: 15, color: COLORS.purple700 },
   dateBtn: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 16, gap: 12 },
   dateBtnText: { fontSize: 16, fontWeight: '600', color: COLORS.purple700 },
+  pickerInline: { marginTop: 12, marginBottom: 4, backgroundColor: COLORS.purple100, borderRadius: 12, padding: 12, borderWidth: 1, borderColor: COLORS.purple200 },
   timeRow: { flexDirection: 'row', gap: 12 },
   timeCol: { flex: 1 },
   calcCard: { borderRadius: 20, padding: 20, marginTop: 16 },
