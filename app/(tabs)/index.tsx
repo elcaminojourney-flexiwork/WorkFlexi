@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet, ImageBackground, View } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { HelloWave } from "@/components/HelloWave";
@@ -18,6 +18,8 @@ const COLORS = {
 
 export default function HomeScreen() {
   return (
+    <ImageBackground source={require('../../assets/images/background.webp')} style={styles.bg} resizeMode="cover">
+      <LinearGradient colors={['#8B5CF6', '#3B82F6', '#9333EA']} style={StyleSheet.absoluteFillObject} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#A1CEDC", dark: "#1D3D47" }}
       headerImage={
@@ -71,7 +73,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-
+  bg: { flex: 1 },
   logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
   logo: { width: 32, height: 32 },
 

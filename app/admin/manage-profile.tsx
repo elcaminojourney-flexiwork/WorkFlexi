@@ -116,8 +116,15 @@ export default function ManageProfileScreen() {
     }
   };
 
+  const bgWrap = (inner: React.ReactNode) => (
+    <ImageBackground source={require('../../assets/images/background.webp')} style={styles.bg} resizeMode="cover">
+      <LinearGradient colors={['#8B5CF6', '#3B82F6', '#9333EA']} style={StyleSheet.absoluteFillObject} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+      {inner}
+    </ImageBackground>
+  );
+
   if (loading) {
-    return (
+    return bgWrap(
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#8B5CF6" />
         <Text style={styles.loadingText}>Loading profile…</Text>
@@ -126,7 +133,7 @@ export default function ManageProfileScreen() {
   }
 
   if (!profile) {
-    return (
+    return bgWrap(
       <View style={styles.center}>
         <Text style={styles.errorText}>Profile not found</Text>
         <Button mode="outlined" onPress={() => router.back()} style={{ marginTop: 16 }}>
@@ -136,7 +143,7 @@ export default function ManageProfileScreen() {
     );
   }
 
-  return (
+  return bgWrap(
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Header */}
       <View style={styles.header}>
@@ -240,7 +247,7 @@ export default function ManageProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-
+  bg: { flex: 1 },
   logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
   logo: { width: 32, height: 32 },
 

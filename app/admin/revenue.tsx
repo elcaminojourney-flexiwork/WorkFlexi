@@ -8,7 +8,8 @@ import {
   Alert,
   RefreshControl,
   TouchableOpacity,
-ImageBackground,
+  ImageBackground,
+  Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -142,8 +143,15 @@ export default function AdminRevenue() {
     return id.slice(0, 8) + '...';
   };
 
+  const bgWrap = (inner: React.ReactNode) => (
+    <ImageBackground source={require('../../assets/images/background.webp')} style={styles.bg} resizeMode="cover">
+      <LinearGradient colors={['#8B5CF6', '#3B82F6', '#9333EA']} style={StyleSheet.absoluteFillObject} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+      {inner}
+    </ImageBackground>
+  );
+
   if (loading && !refreshing) {
-    return (
+    return bgWrap(
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#3B82F6" />
         <Text style={styles.loadingText}>Loading revenue…</Text>
@@ -151,7 +159,7 @@ export default function AdminRevenue() {
     );
   }
 
-  return (
+  return bgWrap(
     <View style={styles.screen}>
       {/* Header */}
       <View style={styles.header}>
@@ -271,7 +279,7 @@ export default function AdminRevenue() {
 }
 
 const styles = StyleSheet.create({
-
+  bg: { flex: 1 },
   logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
   logo: { width: 32, height: 32 },
 

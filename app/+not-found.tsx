@@ -1,6 +1,5 @@
 import { Link, Stack } from 'expo-router';
-import { StyleSheet, ImageBackground,
-} from 'react-native';
+import { StyleSheet, Platform, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { ThemedText } from '@/components/ThemedText';
@@ -19,18 +18,21 @@ export default function NotFoundScreen() {
   return (
     <>
       <Stack.Screen options={{ title: 'Oops!' }} />
-      <ThemedView style={styles.container}>
-        <ThemedText type="title">This screen does not exist.</ThemedText>
-        <Link href="/" style={styles.link}>
-          <ThemedText type="link">Go to home screen!</ThemedText>
-        </Link>
-      </ThemedView>
+      <ImageBackground source={require('../assets/images/background.webp')} style={styles.bg} resizeMode="cover">
+        <LinearGradient colors={['#8B5CF6', '#3B82F6', '#9333EA']} style={StyleSheet.absoluteFillObject} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
+        <ThemedView style={styles.container}>
+          <ThemedText type="title">This screen does not exist.</ThemedText>
+          <Link href="/" style={styles.link}>
+            <ThemedText type="link">Go to home screen!</ThemedText>
+          </Link>
+        </ThemedView>
+      </ImageBackground>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-
+  bg: { flex: 1 },
   logoBox: { position: 'absolute', top: Platform.OS === 'web' ? 16 : 52, left: 16, zIndex: 1000, backgroundColor: 'rgba(255,255,255,0.95)', borderRadius: 14, padding: 8, shadowColor: '#7C3AED', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 12, elevation: 8 },
   logo: { width: 32, height: 32 },
 

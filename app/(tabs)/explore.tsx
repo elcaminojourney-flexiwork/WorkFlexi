@@ -1,5 +1,5 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet, ImageBackground } from 'react-native';
+import { Platform, StyleSheet, ImageBackground, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { Collapsible } from '@/components/Collapsible';
@@ -20,6 +20,8 @@ const COLORS = {
 
 export default function TabTwoScreen() {
   return (
+    <ImageBackground source={require('../../assets/images/background.webp')} style={styles.bg} resizeMode="cover">
+      <LinearGradient colors={['#8B5CF6', '#3B82F6', '#9333EA']} style={StyleSheet.absoluteFillObject} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
       headerImage={
@@ -103,6 +105,7 @@ export default function TabTwoScreen() {
         })}
       </Collapsible>
     </ParallaxScrollView>
+    </ImageBackground>
   );
 }
 

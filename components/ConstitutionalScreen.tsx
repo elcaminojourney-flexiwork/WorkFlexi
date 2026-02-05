@@ -21,7 +21,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
 const GRADIENT_HEADER = ['#9333EA', '#7C3AED', '#3B82F6'] as const;
-const GRADIENT_BG = ['rgba(139, 92, 246, 0.95)', 'rgba(59, 130, 246, 0.92)', 'rgba(147, 51, 234, 0.90)'] as const;
+/** Teljes (nem átlátszó) háttérpanel – ugyanaz a kép + gradient mint a login oldalakon, telt formában. Login oldalakat ne módosítsd. */
+const GRADIENT_BG_FULL = ['#8B5CF6', '#3B82F6', '#9333EA'] as const;
 const PANEL_PURPLE = '#F3E8FF';
 const PANEL_BLUE = '#DBEAFE';
 const WHITE = '#FFFFFF';
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 22, fontWeight: '700', color: WHITE },
   headerSpacer: { width: 40 },
   scroll: { flex: 1 },
-  scrollLight: { backgroundColor: CONTENT_BG_LIGHT },
+  scrollLight: { backgroundColor: 'rgba(248,249,250,0.94)' },
   scrollContent: { paddingHorizontal: 16, paddingTop: 20, paddingBottom: 24 },
   staticContent: { flex: 1, paddingHorizontal: 16, paddingTop: 20 },
   footer: { textAlign: 'center', marginTop: 24, marginBottom: 16, fontSize: 12, color: 'rgba(255,255,255,0.6)' },
