@@ -31,12 +31,12 @@ export default function PaymentsPage() {
 
       const { data } = await supabase
         .from('payments')
-        .select('id, amount, status, created_at, profiles!payments_worker_id_fkey(full_name)')
+        .select('id, total_charged, worker_payout, status, created_at, profiles!payments_worker_id_fkey(full_name)')
         .eq('employer_id', user.id)
         .order('created_at', { ascending: false });
 
       const mapped = (data || []).map((p: any) => ({
-        id: p.id, amount: p.amount, status: p.status, created_at: p.created_at,
+        id: p.id, amount: Number(p.total_charged ?? p.worker_payout ?? 0), status: p.status, created_at: p.created_at,
         worker_name: p.profiles?.full_name,
       }));
       setPayments(mapped);

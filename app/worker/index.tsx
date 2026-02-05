@@ -24,7 +24,7 @@ export default function WorkerDashboard() {
       if (!user) { router.replace('/auth/select-user-type'); return; }
       const { data: p } = await supabase.from('profiles').select('*').eq('id', user.id).single();
       setProfile(p);
-      const { count: pc } = await supabase.from('shift_applications').select('*', { count: 'exact', head: true }).eq('worker_id', user.id).eq('status', 'pending');
+      const { count: pc } = await supabase.from('applications').select('*', { count: 'exact', head: true }).eq('worker_id', user.id).eq('status', 'pending');
       setStats({ upcoming: 0, pending: pc || 0 });
     } catch (e) { console.error(e); } finally { setLoading(false); setRefreshing(false); }
   };

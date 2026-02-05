@@ -8,7 +8,7 @@ import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../components/C
 
 const COLORS = { purple300: '#D8B4FE', purple600: '#9333EA', blue500: '#3B82F6', blue600: '#2563EB', white: '#FFFFFF' };
 
-type Application = { id: string; shift_id: string; status: string; shift_title: string | null; employer_name: string | null; shift_date: string | null; created_at: string; };
+type Application = { id: string; shift_id: string; status: string; shift_title: string | null; employer_name: string | null; shift_date: string | null; applied_at: string; };
 
 export default function WorkerApplicationsPage() {
   const router = useRouter();
@@ -26,13 +26,13 @@ export default function WorkerApplicationsPage() {
       if (!user) { router.replace('/auth/select-user-type'); return; }
 
       const { data } = await supabase
-        .from('shift_applications')
-        .select('id, shift_id, status, created_at, shifts(title, start_time, profiles!shifts_employer_id_fkey(full_name))')
+        .from('applications')
+        .select('id, shift_id, status, applied_at, shifts(title, start_time, profiles!shifts_employer_id_fkey(full_name))')
         .eq('worker_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('applied_at', { ascending: false });
 
       const mapped = (data || []).map((a: any) => ({
-        id: a.id, shift_id: a.shift_id, status: a.status, created_at: a.created_at,
+        id: a.id, shift_id: a.shift_id, status: a.status, applied_at: a.applied_at ?? a.created_at,
         shift_title: a.shifts?.title, employer_name: a.shifts?.profiles?.full_name, shift_date: a.shifts?.start_time,
       }));
       setApplications(mapped);
@@ -48,7 +48,7 @@ export default function WorkerApplicationsPage() {
     Alert.alert('Cancel Application', 'Are you sure?', [
       { text: 'No', style: 'cancel' },
       { text: 'Yes', style: 'destructive', onPress: async () => {
-        await supabase.from('shift_applications').delete().eq('id', id);
+        await supabase.from('applications').delete().eq('id', id);
         setApplications(applications.filter(a => a.id !== id));
       }},
     ]);

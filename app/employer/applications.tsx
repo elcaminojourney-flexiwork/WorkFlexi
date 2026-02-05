@@ -7,7 +7,7 @@ import ConstitutionalScreen, { PanelPurple, PanelBlue } from '../../components/C
 
 const COLORS = { purple100: '#F3E8FF', purple200: '#E9D5FF', purple300: '#D8B4FE', purple400: '#C084FC', purple500: '#A855F7', purple600: '#9333EA', purple700: '#7C3AED', purple800: '#6D28D9', blue100: '#DBEAFE', blue200: '#BFDBFE', blue300: '#93C5FD', blue400: '#60A5FA', blue500: '#3B82F6', blue600: '#2563EB', blue700: '#1D4ED8', white: '#FFFFFF', gray900: '#111827' };
 
-type App = { id: string; shift_id: string; worker_id: string; status: string; worker_name: string | null; shift_title: string | null; created_at: string; };
+type App = { id: string; shift_id: string; worker_id: string; status: string; worker_name: string | null; shift_title: string | null; applied_at: string; };
 
 export default function ApplicationsPage() {
   const router = useRouter();
@@ -23,13 +23,13 @@ export default function ApplicationsPage() {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.replace('/auth/select-user-type'); return; }
-      const { data } = await supabase.from('shift_applications').select('id, shift_id, worker_id, status, created_at, shifts(title), profiles!shift_applications_worker_id_fkey(full_name)').eq('shifts.employer_id', user.id).order('created_at', { ascending: false });
-      setApps((data || []).map((a: any) => ({ id: a.id, shift_id: a.shift_id, worker_id: a.worker_id, status: a.status, worker_name: a.profiles?.full_name, shift_title: a.shifts?.title, created_at: a.created_at })));
+      const { data } = await supabase.from('applications').select('id, shift_id, worker_id, status, applied_at, shifts(title), profiles!applications_worker_id_fkey(full_name)').eq('shifts.employer_id', user.id).order('applied_at', { ascending: false });
+      setApps((data || []).map((a: any) => ({ id: a.id, shift_id: a.shift_id, worker_id: a.worker_id, status: a.status, worker_name: a.profiles?.full_name, shift_title: a.shifts?.title, applied_at: a.applied_at ?? a.created_at })));
     } catch (e) { Alert.alert('Error', 'Failed'); } finally { setLoading(false); setRefreshing(false); }
   };
 
   const handleAction = async (id: string, action: 'approved' | 'rejected') => {
-    await supabase.from('shift_applications').update({ status: action }).eq('id', id);
+    await supabase.from('applications').update({ status: action }).eq('id', id);
     setApps(apps.map(a => a.id === id ? { ...a, status: action } : a));
   };
 

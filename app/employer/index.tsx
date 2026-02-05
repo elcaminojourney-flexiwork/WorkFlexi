@@ -30,7 +30,7 @@ export default function EmployerDashboard() {
         activeShifts = sc ?? 0;
       } catch (_) { /* stats may fail if table/RLS not ready */ }
       try {
-        const { count: ac } = await supabase.from('shift_applications').select('*, shifts!inner(employer_id)', { count: 'exact', head: true }).eq('shifts.employer_id', user.id).eq('status', 'pending');
+        const { count: ac } = await supabase.from('applications').select('*, shifts!inner(employer_id)', { count: 'exact', head: true }).eq('shifts.employer_id', user.id).eq('status', 'pending');
         pendingApps = ac ?? 0;
       } catch (_) { /* optional stats */ }
       setStats({ activeShifts, pendingApps });
