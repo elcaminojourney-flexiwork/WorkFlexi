@@ -227,10 +227,10 @@ export default function ReviewWorker() {
       if (addToFavorites) {
         const { error: favoriteError } = await supabase
           .from('favorites')
-          .upsert({
-            employer_id: user.id,
-            worker_id: worker.id,
-          });
+          .upsert(
+            { employer_id: user.id, worker_id: worker.id },
+            { onConflict: 'employer_id,worker_id' }
+          );
 
         if (favoriteError) {
           console.error('Error adding to favorites:', favoriteError);

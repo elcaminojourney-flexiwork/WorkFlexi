@@ -276,10 +276,10 @@ export default function WorkerProfileView() {
         // Add to favorites
         const { error } = await supabase
           .from('favorites')
-          .upsert({
-            employer_id: user.id,
-            worker_id: workerIdStr,
-          });
+          .upsert(
+            { employer_id: user.id, worker_id: workerIdStr },
+            { onConflict: 'employer_id,worker_id' }
+          );
 
         if (error) throw error;
 

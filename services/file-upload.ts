@@ -18,14 +18,13 @@ export async function uploadProfilePhoto(
   try {
     // Get file extension
     const fileExt = imageUri.split('.').pop() || 'jpg';
-    const fileName = `${userId}/profile-${Date.now()}.${fileExt}`;
-    const filePath = `employer-profiles/${fileName}`;
+    const filePath = `${userId}/profile-${Date.now()}.${fileExt}`;
 
     // Convert image to blob
     const response = await fetch(imageUri);
     const blob = await response.blob();
 
-    // Upload to Supabase Storage
+    // Upload to Supabase Storage (path = key inside bucket; no bucket name in path for RLS)
     const { data, error } = await supabase.storage
       .from('employer-profiles')
       .upload(filePath, blob, {
@@ -64,14 +63,13 @@ export async function uploadWorkerProfilePhoto(
   try {
     // Get file extension
     const fileExt = imageUri.split('.').pop() || 'jpg';
-    const fileName = `${userId}/profile-${Date.now()}.${fileExt}`;
-    const filePath = `worker-profiles/${fileName}`;
+    const filePath = `${userId}/profile-${Date.now()}.${fileExt}`;
 
     // Convert image to blob
     const response = await fetch(imageUri);
     const blob = await response.blob();
 
-    // Upload to Supabase Storage
+    // Upload to Supabase Storage (path = key inside bucket; no bucket name in path for RLS)
     const { data, error } = await supabase.storage
       .from('worker-profiles')
       .upload(filePath, blob, {
@@ -112,14 +110,13 @@ export async function uploadDocument(
   try {
     // Get file extension
     const fileExt = fileName.split('.').pop() || 'pdf';
-    const storageFileName = `${userId}/cv-${Date.now()}.${fileExt}`;
-    const filePath = `employer-documents/${storageFileName}`;
+    const filePath = `${userId}/cv-${Date.now()}.${fileExt}`;
 
     // Convert file to blob
     const response = await fetch(fileUri);
     const blob = await response.blob();
 
-    // Upload to Supabase Storage
+    // Upload to Supabase Storage (path = key inside bucket; no bucket name in path for RLS)
     const { data, error } = await supabase.storage
       .from('employer-documents')
       .upload(filePath, blob, {

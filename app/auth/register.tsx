@@ -49,15 +49,18 @@ export default function RegisterPage() {
       if (authError) throw authError;
 
       if (authData.user) {
-        const { error: profileError } = await supabase.from('profiles').upsert({
-          id: authData.user.id,
-          full_name: fullName,
-          email: email,
-          user_type: userType,
-          company_name: userType === 'employer' ? companyName : null,
-          onboarding_completed: false,
-          created_at: new Date().toISOString(),
-        });
+        const { error: profileError } = await supabase.from('profiles').upsert(
+          {
+            id: authData.user.id,
+            full_name: fullName,
+            email: email,
+            user_type: userType,
+            company_name: userType === 'employer' ? companyName : null,
+            onboarding_completed: false,
+            created_at: new Date().toISOString(),
+          },
+          { onConflict: 'id' }
+        );
         if (profileError) throw profileError;
 
         // New sign up → onboarding (user is already logged in)
