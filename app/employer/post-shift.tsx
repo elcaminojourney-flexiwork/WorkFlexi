@@ -293,9 +293,33 @@ export default function PostShift() {
         </TouchableOpacity>
       </View>
 
-      <DateTimePicker visible={showDatePicker} mode="date" value={shiftDate} onConfirm={(d) => { setShiftDate(d); setShowDatePicker(false); }} onCancel={() => setShowDatePicker(false)} />
-      <DateTimePicker visible={showStartTimePicker} mode="time" value={startTime} onConfirm={(d) => { setStartTime(d); setShowStartTimePicker(false); }} onCancel={() => setShowStartTimePicker(false)} />
-      <DateTimePicker visible={showEndTimePicker} mode="time" value={endTime} onConfirm={(d) => { setEndTime(d); setShowEndTimePicker(false); }} onCancel={() => setShowEndTimePicker(false)} />
+      {showDatePicker && (
+        <DateTimePicker
+          mode="date"
+          value={shiftDate}
+          onChange={(_, date) => {
+            if (date) { setShiftDate(date); setShowDatePicker(false); }
+          }}
+        />
+      )}
+      {showStartTimePicker && (
+        <DateTimePicker
+          mode="time"
+          value={startTime}
+          onChange={(_, date) => {
+            if (date) { setStartTime(date); setShowStartTimePicker(false); }
+          }}
+        />
+      )}
+      {showEndTimePicker && (
+        <DateTimePicker
+          mode="time"
+          value={endTime}
+          onChange={(_, date) => {
+            if (date) { setEndTime(date); setShowEndTimePicker(false); }
+          }}
+        />
+      )}
     </ConstitutionalScreen>
   );
 }
