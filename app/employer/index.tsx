@@ -91,12 +91,22 @@ export default function EmployerDashboard() {
         </PanelBlue>
 
         <View style={styles.quickActionsGrid}>
-          {quickActions.map((item, i) => (
-            <CardWhite key={i} style={styles.quickActionCard} onPress={() => router.push(item.route as any)}>
-              <Ionicons name={item.icon as any} size={36} color={COLORS.purple600} />
-              <Text style={styles.menuLabel}>{item.label}</Text>
-            </CardWhite>
-          ))}
+          <View style={styles.quickActionsRow}>
+            {quickActions.slice(0, 2).map((item, i) => (
+              <CardWhite key={i} style={styles.quickActionCard} onPress={() => router.push(item.route as any)}>
+                <Ionicons name={item.icon as any} size={36} color={COLORS.purple600} />
+                <Text style={styles.menuLabel}>{item.label}</Text>
+              </CardWhite>
+            ))}
+          </View>
+          <View style={styles.quickActionsRow}>
+            {quickActions.slice(2, 4).map((item, i) => (
+              <CardWhite key={2 + i} style={styles.quickActionCard} onPress={() => router.push(item.route as any)}>
+                <Ionicons name={item.icon as any} size={36} color={COLORS.purple600} />
+                <Text style={styles.menuLabel}>{item.label}</Text>
+              </CardWhite>
+            ))}
+          </View>
         </View>
 
         <PanelBlue style={[styles.sectionHeader, { marginTop: 20 }]}>
@@ -104,12 +114,22 @@ export default function EmployerDashboard() {
         </PanelBlue>
 
         <View style={styles.quickActionsGrid}>
-          {moreItems.map((item, i) => (
-            <CardWhite key={i} style={styles.quickActionCard} onPress={() => router.push(item.route as any)}>
-              <Ionicons name={item.icon as any} size={36} color={COLORS.purple600} />
-              <Text style={styles.menuLabel}>{item.label}</Text>
-            </CardWhite>
-          ))}
+          <View style={styles.quickActionsRow}>
+            {moreItems.slice(0, 2).map((item, i) => (
+              <CardWhite key={i} style={styles.quickActionCard} onPress={() => router.push(item.route as any)}>
+                <Ionicons name={item.icon as any} size={36} color={COLORS.purple600} />
+                <Text style={styles.menuLabel}>{item.label}</Text>
+              </CardWhite>
+            ))}
+          </View>
+          <View style={styles.quickActionsRow}>
+            {moreItems.slice(2, 4).map((item, i) => (
+              <CardWhite key={2 + i} style={styles.quickActionCard} onPress={() => router.push(item.route as any)}>
+                <Ionicons name={item.icon as any} size={36} color={COLORS.purple600} />
+                <Text style={styles.menuLabel}>{item.label}</Text>
+              </CardWhite>
+            ))}
+          </View>
         </View>
 
         <PanelPurple style={styles.ctaCard}>
@@ -147,8 +167,9 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 13, color: '#6B7280', marginTop: 4 },
   sectionHeader: { marginTop: 24, marginBottom: 12, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 12 },
   sectionTitle: { fontSize: 18, fontWeight: '700', color: '#1E40AF' },
-  quickActionsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  quickActionCard: { width: (width - 32 - 12) / 2, minHeight: 120, borderRadius: 16, padding: 20, alignItems: 'center', justifyContent: 'center' },
+  quickActionsGrid: { gap: 12 },
+  quickActionsRow: { flexDirection: 'row', gap: 12, marginBottom: 0 },
+  quickActionCard: { flex: 1, minHeight: 120, borderRadius: 16, padding: 20, alignItems: 'center', justifyContent: 'center' },
   menuLabel: { fontSize: 15, fontWeight: '700', color: '#111827', marginTop: 8 },
   ctaCard: { marginTop: 24, borderRadius: 16, overflow: 'hidden' },
   ctaHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, backgroundColor: 'rgba(147, 51, 234, 0.12)' },

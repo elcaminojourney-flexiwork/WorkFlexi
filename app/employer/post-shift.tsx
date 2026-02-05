@@ -92,7 +92,9 @@ export default function PostShift() {
       if (error) throw error;
       Alert.alert('Success!', 'Shift posted!', [{ text: 'View', onPress: () => router.replace(`/employer/shift/${shift.id}`) }]);
     } catch (err: any) {
-      Alert.alert('Error', err.message);
+      const msg = err?.message || err?.error_description || String(err);
+      const details = err?.details ? ` (${err.details})` : '';
+      Alert.alert('Error', (msg + details) || 'Failed to post shift. If you see 500, run the shifts RLS SQL in Supabase SQL Editor.');
     } finally {
       setLoading(false);
     }
@@ -261,13 +263,19 @@ export default function PostShift() {
 
             <View style={styles.cardBody}>
               <LinearGradient colors={[COLORS.purple200, COLORS.blue200]} style={styles.summaryBox}>
-                <View style={styles.summaryRow}><Ionicons name="briefcase" size={18} color={COLORS.purple600} /><Text style={styles.summaryLabel}>Job:</Text><Text style={styles.summaryValue}>{jobTitle}</Text></View>
-                <View style={styles.summaryRow}><Ionicons name="business" size={18} color={COLORS.blue600} /><Text style={styles.summaryLabel}>Industry:</Text><Text style={styles.summaryValue}>{industry}</Text></View>
-                <View style={styles.summaryRow}><Ionicons name="calendar" size={18} color={COLORS.purple600} /><Text style={styles.summaryLabel}>Date:</Text><Text style={styles.summaryValue}>{formatDate(shiftDate)}</Text></View>
-                <View style={styles.summaryRow}><Ionicons name="time" size={18} color={COLORS.blue600} /><Text style={styles.summaryLabel}>Time:</Text><Text style={styles.summaryValue}>{formatTime(startTime)} - {formatTime(endTime)}</Text></View>
-                <View style={styles.summaryRow}><Ionicons name="location" size={18} color={COLORS.purple600} /><Text style={styles.summaryLabel}>Location:</Text><Text style={styles.summaryValue}>{location}</Text></View>
-                <View style={styles.summaryRow}><Ionicons name="people" size={18} color={COLORS.blue600} /><Text style={styles.summaryLabel}>Workers:</Text><Text style={styles.summaryValue}>{workersNeeded}</Text></View>
-                <View style={styles.summaryRow}><Ionicons name="cash" size={18} color={COLORS.purple600} /><Text style={styles.summaryLabel}>Rate:</Text><Text style={styles.summaryValue}>SGD ${hourlyRate}/hr</Text></View>
+                <View style={styles.summaryTwoRows}>
+                  <View style={styles.summaryCol}>
+                    <View style={styles.summaryRow}><Ionicons name="briefcase" size={18} color={COLORS.purple600} /><Text style={styles.summaryLabel}>Job:</Text><Text style={styles.summaryValue}>{jobTitle}</Text></View>
+                    <View style={styles.summaryRow}><Ionicons name="business" size={18} color={COLORS.blue600} /><Text style={styles.summaryLabel}>Industry:</Text><Text style={styles.summaryValue}>{industry}</Text></View>
+                    <View style={styles.summaryRow}><Ionicons name="calendar" size={18} color={COLORS.purple600} /><Text style={styles.summaryLabel}>Date:</Text><Text style={styles.summaryValue}>{formatDate(shiftDate)}</Text></View>
+                    <View style={styles.summaryRow}><Ionicons name="time" size={18} color={COLORS.blue600} /><Text style={styles.summaryLabel}>Time:</Text><Text style={styles.summaryValue}>{formatTime(startTime)} - {formatTime(endTime)}</Text></View>
+                  </View>
+                  <View style={styles.summaryCol}>
+                    <View style={styles.summaryRow}><Ionicons name="location" size={18} color={COLORS.purple600} /><Text style={styles.summaryLabel}>Location:</Text><Text style={styles.summaryValue}>{location}</Text></View>
+                    <View style={styles.summaryRow}><Ionicons name="people" size={18} color={COLORS.blue600} /><Text style={styles.summaryLabel}>Workers:</Text><Text style={styles.summaryValue}>{workersNeeded}</Text></View>
+                    <View style={styles.summaryRow}><Ionicons name="cash" size={18} color={COLORS.purple600} /><Text style={styles.summaryLabel}>Rate:</Text><Text style={styles.summaryValue}>SGD ${hourlyRate}/hr</Text></View>
+                  </View>
+                </View>
               </LinearGradient>
               <LinearGradient colors={[COLORS.purple500, COLORS.blue500]} style={styles.totalBox}>
                 <Text style={styles.totalBoxLabel}>Total Amount</Text>
@@ -358,6 +366,8 @@ const styles = StyleSheet.create({
   totalLabel: { fontSize: 16, fontWeight: '700', color: '#FFFFFF' },
   totalValue: { fontSize: 18, fontWeight: '800', color: '#FFFFFF' },
   summaryBox: { borderRadius: 16, padding: 16 },
+  summaryTwoRows: { flexDirection: 'row', gap: 16 },
+  summaryCol: { flex: 1 },
   summaryRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, gap: 12 },
   summaryLabel: { fontSize: 14, color: COLORS.purple700, width: 70 },
   summaryValue: { flex: 1, fontSize: 15, fontWeight: '600', color: COLORS.gray900 },
